@@ -7,7 +7,7 @@
 </script>
 
 <dialog
-    class="p-8 rounded text-white backdrop:backdrop-blur-sm bg-primary w-[90%] md:w-3xl"
+    class="p-8 w-full text-white rounded backdrop:backdrop-blur-sm bg-primary md:w-3xl"
     bind:this={dialog}
     on:close={() => (showModal = false)}>
     <div class="flex flex-row justify-between items-center border-b-2 b-secondary">
