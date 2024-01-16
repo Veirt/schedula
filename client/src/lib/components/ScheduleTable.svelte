@@ -35,7 +35,8 @@
             {#each schedule[currentDay] as scheduleEntry, idx}
                 {@const lecturers = scheduleEntry.lecturer.split("/")}
                 <tr>
-                    <td class="p-3 text-center border b-secondary">{scheduleEntry.start} - {scheduleEntry.end}</td>
+                    <td class="p-3 text-center border b-secondary"
+                        >{scheduleEntry.startTime} - {scheduleEntry.endTime}</td>
                     <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
                     <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
                     <td class="p-3 border text-[12px] b-secondary">

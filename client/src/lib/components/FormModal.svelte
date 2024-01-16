@@ -12,18 +12,18 @@
         <label class="my-3" for="Day">Day</label>
         <select class="p-2 bg-alt" id="day">
             {#each days as day (day.index)}
-                <option selected={currScheduleEntry.dayIndex === day.index} value={day.index}>{day.name}</option>
+                <option selected={currScheduleEntry.day === day.index} value={day.index}>{day.name}</option>
             {/each}
         </select>
 
         <div class="flex flex-row justify-between mt-3 w-full md:gap-5">
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-start">Start</label>
-                <input bind:value={currScheduleEntry.start} id="time-start" class="p-2 bg-alt" type="text" />
+                <input bind:value={currScheduleEntry.startTime} id="time-start" class="p-2 bg-alt" type="text" />
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>
-                <input bind:value={currScheduleEntry.end} id="time-end" class="p-2 bg-alt" type="text" />
+                <input bind:value={currScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
             </div>
         </div>
 

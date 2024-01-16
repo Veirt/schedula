@@ -11,13 +11,13 @@
 
     let showFormModal = false
     let currScheduleEntry: ScheduleEntry = {
-        start: "",
-        end: "",
+        id: 0,
         classroom: "",
         course: "",
         lecturer: "",
-        dayIndex: 0,
-        entryIndex: 0,
+        startTime: "",
+        endTime: "",
+        day: 0,
     }
 
     const getSchedule = async () => {

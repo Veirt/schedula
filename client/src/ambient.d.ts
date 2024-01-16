@@ -1,9 +1,9 @@
 type ScheduleEntry = {
-    dayIndex: number
-    entryIndex: number
-    start: string
-    end: string
-    classroom: string
+    id: number
     course: string
+    classroom: string
     lecturer: string
+    startTime: string
+    endTime: string
+    day: number
 }
