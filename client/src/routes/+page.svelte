@@ -1,19 +1,27 @@
 <script lang="ts">
     import ScheduleTable from "$lib/components/ScheduleTable.svelte"
     import WeekDayView from "$lib/components/WeekDayView.svelte"
+    import FormModal from "$lib/components/FormModal.svelte"
     import { onMount } from "svelte"
-    import { dev } from "$app/environment"
+    import { getHost } from "$lib/utils/host"
 
     let loading = true
     let currentDay = new Date().getDay()
     let schedule: never[][] = []
 
-    const getSchedule = async () => {
-        let host = window.location.host
-        if (dev) {
-            host = "http://localhost:3000"
-        }
+    let showFormModal = false
+    let currScheduleEntry: ScheduleEntry = {
+        start: "",
+        end: "",
+        classroom: "",
+        course: "",
+        lecturer: "",
+        dayIndex: 0,
+        entryIndex: 0,
+    }
 
+    const getSchedule = async () => {
+        const host = getHost(window)
         return await fetch(`${host}/api/schedule`).then((res) => res.json())
     }
 
@@ -27,10 +35,11 @@
 
 <main class="flex flex-col justify-center items-center mt-15">
     <h1 class="text-3xl">Schedule</h1>
+    <FormModal bind:showFormModal bind:currScheduleEntry />
     <WeekDayView bind:currentDay />
     {#if loading}
         <p>Loading...</p>
     {:else}
-        <ScheduleTable {currentDay} {schedule} />
+        <ScheduleTable bind:currScheduleEntry bind:showFormModal {currentDay} {schedule} />
     {/if}
 </main>

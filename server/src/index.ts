@@ -1,9 +1,13 @@
 import { Hono } from "hono"
+import { cors } from "hono/cors"
 import fs from "fs"
 
 const app = new Hono()
+app.use("/api/*", cors())
 
 type ScheduleEntry = {
+    dayIndex: number
+    entryIndex: number
     start: string
     end: string
     classroom: string
@@ -17,7 +21,18 @@ type Schedule = ScheduleEntry[][]
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 function getSchedule() {
-    const schedule: Schedule = JSON.parse(fs.readFileSync("./schedule.json", { encoding: "utf8" }))
+    let schedule: Schedule = JSON.parse(fs.readFileSync("./schedule.json", { encoding: "utf8" }))
+
+    schedule = schedule.map((todaySchedule, dayIdx) => {
+        todaySchedule.map((entry, entryIdx) => {
+            entry.dayIndex = dayIdx
+            entry.entryIndex = entryIdx
+
+            return entry
+        })
+
+        return todaySchedule
+    })
 
     return schedule
 }
@@ -33,6 +48,17 @@ app.get("/api/schedule/today", (c) => {
         data: {
             day: dayNames[day],
             schedule: getSchedule()[day],
+        },
+    })
+})
+
+app.get("/api/schedule/:day/entry/:entry", (c) => {
+    const day = parseInt(c.req.param("day"))
+    const entry = parseInt(c.req.param("entry"))
+
+    return c.json({
+        data: {
+            schedule: getSchedule()[day][entry],
         },
     })
 })

@@ -1,33 +1,27 @@
 <script lang="ts">
-    export let currentDay: number
+    import { days } from "$lib/utils/day"
 
-    const days = [
-        { name: "Monday", index: 1 },
-        { name: "Tuesday", index: 2 },
-        { name: "Wednesday", index: 3 },
-        { name: "Thursday", index: 4 },
-        { name: "Friday", index: 5 },
-        { name: "Saturday", index: 6 },
-        { name: "Sunday", index: 0 },
-    ]
+    export let currentDay: number
 
     let displayWeekend = false
 </script>
 
-<div class="flex flex-row mt-5">
+<div class="flex flex-wrap justify-center mt-5 md:flex-row">
     {#each days as day (day.index)}
         <button
             data-day-idx={day.index}
             on:click={() => (currentDay = day.index)}
             class:active={currentDay === day.index}
             class:weekend={!displayWeekend && (day.index === 0 || day.index === 6)}
-            class="p-2 border cursor-pointer min-w-25 b-secondary"
-        >
+            class="p-2 border cursor-pointer min-w-25 b-secondary">
             {day.name}
         </button>
     {/each}
 </div>
-<div class="my-3"><input bind:checked={displayWeekend} type="checkbox" /> Display Weekend?</div>
+<div class="my-3">
+    <input id="display-weekend" bind:checked={displayWeekend} type="checkbox" />
+    <label class="select-none" for="display-weekend">Display Weekend?</label>
+</div>
 
 <style lang="postcss">
     .active {

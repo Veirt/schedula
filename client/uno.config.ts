@@ -6,6 +6,7 @@ export default defineConfig({
         colors: {
             primary: "#151515",
             secondary: "#343434",
+            alt: "#262626",
         },
     },
 })
