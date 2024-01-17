@@ -80,7 +80,7 @@ app.patch("/api/schedule/:id", async (c) => {
         return c.json({ error: "Schedule Entry is not found", data: { entry: {} } }, 404)
     }
 
-    entry.day = parseInt(body.day as string) || entry.day
+    entry.day = !isNaN(parseInt(body.day as string)) ? parseInt(body.day as string) : entry.day
     entry.startTime = (body.startTime as string) || entry.startTime
     entry.endTime = (body.endTime as string) || entry.endTime
     entry.classroom = (body.classroom as string) || entry.classroom
