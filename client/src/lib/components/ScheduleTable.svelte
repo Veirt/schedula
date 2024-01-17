@@ -2,7 +2,7 @@
     import { getHost } from "$lib/utils/host"
 
     export let currentDay: number
-    export let showFormModal: boolean
+    export let showUpdateModal: boolean
     export let currScheduleEntry: ScheduleEntry
     export let schedule: ScheduleEntry[][]
 

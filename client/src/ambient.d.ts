@@ -1,5 +1,5 @@
 type ScheduleEntry = {
-    id: number
+    id?: number
     course: string
     classroom: string
     lecturer: string

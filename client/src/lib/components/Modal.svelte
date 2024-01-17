@@ -3,7 +3,10 @@
 
     let dialog: HTMLDialogElement
 
-    $: if (dialog && showModal) dialog.showModal()
+    $: {
+        if (dialog && showModal) dialog.showModal()
+        if (dialog && showModal == false) dialog.close()
+    }
 </script>
 
 <dialog

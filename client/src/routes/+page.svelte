@@ -1,7 +1,8 @@
 <script lang="ts">
     import ScheduleTable from "$lib/components/ScheduleTable.svelte"
     import WeekDayView from "$lib/components/WeekDayView.svelte"
-    import FormModal from "$lib/components/FormModal.svelte"
+    import UpdateFormModal from "$lib/components/UpdateFormModal.svelte"
+    import CreateFormModal from "$lib/components/CreateFormModal.svelte"
     import { onMount } from "svelte"
     import { getHost } from "$lib/utils/host"
 
@@ -9,9 +10,9 @@
     let currentDay = new Date().getDay()
     let schedule: never[][] = []
 
-    let showFormModal = false
+    let showCreateModal = false
+    let showUpdateModal = false
     let currScheduleEntry: ScheduleEntry = {
-        id: 0,
         classroom: "",
         course: "",
         lecturer: "",
@@ -33,13 +34,16 @@
     })
 </script>
 
+<UpdateFormModal bind:showUpdateModal bind:currScheduleEntry />
+<CreateFormModal bind:showCreateModal />
+
+<button on:click={() => (showCreateModal = true)} class="">Create</button>
 <main class="flex flex-col justify-center items-center mt-15">
     <h1 class="text-3xl">Schedule</h1>
-    <FormModal bind:showFormModal bind:currScheduleEntry />
     <WeekDayView bind:currentDay />
     {#if loading}
         <p>Loading...</p>
     {:else}
-        <ScheduleTable bind:currScheduleEntry bind:showFormModal {currentDay} {schedule} />
+        <ScheduleTable bind:currScheduleEntry bind:showUpdateModal {currentDay} {schedule} />
     {/if}
 </main>

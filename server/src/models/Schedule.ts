@@ -1,5 +1,15 @@
 import db from "../db"
 
+export type ScheduleType = {
+    id?: number
+    course: string
+    classroom: string
+    lecturer: string
+    startTime: string
+    endTime: string
+    day: number
+}
+
 export class Schedule {
     private id?: number
     course: string
@@ -9,7 +19,7 @@ export class Schedule {
     endTime: string
     day: number
 
-    constructor(course: string, classroom: string, lecturer: string, startTime: string, endTime: string, day: number) {
+    constructor({ course, classroom, lecturer, startTime, endTime, day }: ScheduleType) {
         this.course = course
         this.classroom = classroom
         this.lecturer = lecturer
@@ -56,18 +66,18 @@ export class Schedule {
         // schedule.map
     }
 
-    static insert(schedule: Schedule) {
+    insert() {
         const query = db.query(
             "INSERT INTO schedule (course, classroom, lecturer, startTime, endTime, day) VALUES ($course, $classroom, $lecturer, $startTime, $endTime, $day)",
         )
 
         query.run({
-            $course: schedule.course,
-            $classroom: schedule.classroom,
-            $lecturer: schedule.lecturer,
-            $startTime: schedule.startTime,
-            $endTime: schedule.endTime,
-            $day: schedule.day,
+            $course: this.course,
+            $classroom: this.classroom,
+            $lecturer: this.lecturer,
+            $startTime: this.startTime,
+            $endTime: this.endTime,
+            $day: this.day,
         })
     }
 }
