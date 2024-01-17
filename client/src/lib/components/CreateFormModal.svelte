@@ -3,8 +3,10 @@
     import { days } from "$lib/utils/day"
     import { getHost } from "$lib/utils/host"
     import axios from "axios"
+    import dayjs from "dayjs"
 
     export let showCreateModal: boolean
+    export let currentDay: number
 
     let newScheduleEntry: ScheduleEntry = {
         course: "",
@@ -12,8 +14,10 @@
         lecturer: "",
         startTime: "",
         endTime: "",
-        day: 1,
+        day: currentDay,
     }
+
+    $: newScheduleEntry.day = currentDay
 
     async function createSchedule() {
         const host = getHost(window)
@@ -33,10 +37,22 @@
                 lecturer: "",
                 startTime: "",
                 endTime: "",
-                day: 1,
+                day: currentDay,
             }
 
             showCreateModal = false
+        }
+    }
+
+    function getEndTime() {
+        const timeRegex = new RegExp(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+        if (newScheduleEntry.startTime.match(timeRegex)) {
+            const date = new Date("2024-01-01 " + newScheduleEntry.startTime)
+
+            // add 1 hour 30 minutes
+            const addedTime = dayjs(date).add(1, "hour").add(30, "minute")
+            const resultTime = addedTime.format("HH:mm")
+            newScheduleEntry.endTime = resultTime
         }
     }
 </script>
@@ -57,7 +73,12 @@
         <div class="flex flex-row justify-between mt-3 w-full md:gap-5">
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-start">Start</label>
-                <input bind:value={newScheduleEntry.startTime} id="time-start" class="p-2 bg-alt" type="text" />
+                <input
+                    on:change={getEndTime}
+                    bind:value={newScheduleEntry.startTime}
+                    id="time-start"
+                    class="p-2 bg-alt"
+                    type="text" />
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>

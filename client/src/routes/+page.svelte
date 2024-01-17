@@ -35,7 +35,7 @@
 </script>
 
 <UpdateFormModal bind:showUpdateModal bind:currScheduleEntry />
-<CreateFormModal bind:showCreateModal />
+<CreateFormModal bind:currentDay bind:showCreateModal />
 
 <button on:click={() => (showCreateModal = true)} class="">Create</button>
 <main class="flex flex-col justify-center items-center mt-15">
