@@ -151,4 +151,10 @@ export class Schedule {
             $day: this.day,
         })
     }
+
+    delete() {
+        const query = db.query<null, number>("DELETE FROM schedule WHERE id = ?")
+
+        query.run(this.id!)
+    }
 }

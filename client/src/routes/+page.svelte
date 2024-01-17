@@ -10,6 +10,7 @@
     let currentDay = new Date().getDay()
     let schedule: never[][] = []
 
+    let showConfirmModal = true
     let showCreateModal = false
     let showUpdateModal = false
     let currScheduleEntry: ScheduleEntry = {
@@ -35,7 +36,7 @@
 </script>
 
 <UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
-<CreateFormModal on:fetchSchedule={fetchSchedule} bind:currentDay bind:showCreateModal />
+<CreateFormModal on:fetchSchedule={fetchSchedule} bind:showCreateModal bind:currentDay />
 
 <button on:click={() => (showCreateModal = true)} class="">Create</button>
 <main class="flex flex-col justify-center items-center mt-15">
@@ -44,6 +45,11 @@
     {#if loading}
         <p>Loading...</p>
     {:else}
-        <ScheduleTable bind:currScheduleEntry bind:showUpdateModal {currentDay} bind:schedule />
+        <ScheduleTable
+            on:fetchSchedule={fetchSchedule}
+            bind:currScheduleEntry
+            bind:showUpdateModal
+            {currentDay}
+            bind:schedule />
     {/if}
 </main>

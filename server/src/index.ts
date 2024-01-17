@@ -92,6 +92,24 @@ app.patch("/api/schedule/:id", async (c) => {
     return c.json({}, 204)
 })
 
+app.delete("/api/schedule/:id", async (c) => {
+    const id = parseInt(c.req.param("id"))
+
+    if (isNaN(id)) {
+        return c.json({ error: "Invalid id given" }, 400)
+    }
+
+    const entry = Schedule.getFirst({ id })
+    if (!entry) {
+        return c.json({ error: "Schedule Entry is not found", data: { entry: {} } }, 404)
+    }
+
+    const schedule = new Schedule({ ...entry })
+    schedule.delete()
+
+    return c.json({}, 204)
+})
+
 app.get("/api/schedule/day/today", (c) => {
     const day = new Date().getDay()
 

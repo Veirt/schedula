@@ -1,10 +1,18 @@
 <script lang="ts">
+    import ConfirmModal from "$lib/components/ConfirmModal.svelte"
     import { getHost } from "$lib/utils/host"
+    import axios from "axios"
+    import { createEventDispatcher } from "svelte"
 
     export let currentDay: number
     export let showUpdateModal: boolean
     export let currScheduleEntry: ScheduleEntry
     export let schedule: ScheduleEntry[][]
+
+    let showConfirmModal = false
+    let scheduleId: number | undefined
+
+    const dispatch = createEventDispatcher()
 
     async function handleEdit(e: MouseEvent) {
         const target = e.target as HTMLButtonElement
@@ -16,6 +24,17 @@
 
         currScheduleEntry = resData.entry
         showUpdateModal = true
+    }
+
+    async function handleDelete(e: CustomEvent) {
+        const host = getHost(window)
+        const res = await axios.delete(`${host}/api/schedule/${scheduleId}`)
+
+        if (res.status === 204) {
+            dispatch("fetchSchedule")
+        }
+
+        showConfirmModal = false
     }
 </script>
 
@@ -48,10 +67,18 @@
                     <td class="p-3 border b-secondary">
                         <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
                             <button
-                                on:click={handleEdit}
+                                on:click={(e) => {
+                                    scheduleId = scheduleEntry.id
+                                    handleEdit(e)
+                                }}
                                 class="py-2 px-5 rounded bg-alt"
                                 data-schedule-id={scheduleEntry.id}>Edit</button>
-                            <button class="py-2 px-3 rounded bg-alt" data-schedule-id={scheduleEntry.id}>Delete</button>
+                            <button
+                                on:click={() => {
+                                    scheduleId = scheduleEntry.id
+                                    showConfirmModal = true
+                                }}
+                                class="py-2 px-3 rounded bg-alt">Delete</button>
                         </div>
                     </td>
                 </tr>
@@ -59,3 +86,5 @@
         </tbody>
     </table>
 </div>
+
+<ConfirmModal bind:showConfirmModal on:deleteConfirmed={handleDelete} />
