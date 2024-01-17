@@ -4,9 +4,12 @@
     import { getHost } from "$lib/utils/host"
     import axios from "axios"
     import dayjs from "dayjs"
+    import { createEventDispatcher } from "svelte"
 
     export let showCreateModal: boolean
     export let currentDay: number
+
+    const dispatch = createEventDispatcher()
 
     let newScheduleEntry: ScheduleEntry = {
         course: "",
@@ -19,7 +22,7 @@
 
     $: newScheduleEntry.day = currentDay
 
-    async function createSchedule() {
+    async function createScheduleEntry() {
         const host = getHost(window)
 
         const res = await axios.post(`${host}/api/schedule`, newScheduleEntry, {
@@ -41,6 +44,7 @@
             }
 
             showCreateModal = false
+            dispatch("fetchSchedule")
         }
     }
 
@@ -59,12 +63,12 @@
 
 <Modal bind:showModal={showCreateModal}>
     <h2 class="text-xl" slot="title">Create Schedule Entry Form</h2>
-    <form on:submit|preventDefault={createSchedule} class="flex flex-col" slot="contents">
+    <form on:submit|preventDefault={createScheduleEntry} class="flex flex-col" slot="contents">
         <label class="my-3" for="course">Course</label>
-        <input bind:value={newScheduleEntry.course} id="course" class="p-2 bg-alt" type="text" />
+        <input required bind:value={newScheduleEntry.course} id="course" class="p-2 bg-alt" type="text" />
 
         <label class="my-3" for="day">Day</label>
-        <select bind:value={newScheduleEntry.day} class="p-2 bg-alt" id="day">
+        <select required bind:value={newScheduleEntry.day} class="p-2 bg-alt" id="day">
             {#each days as day (day.index)}
                 <option value={day.index}>{day.name}</option>
             {/each}
@@ -74,6 +78,7 @@
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-start">Start</label>
                 <input
+                    required
                     on:change={getEndTime}
                     bind:value={newScheduleEntry.startTime}
                     id="time-start"
@@ -82,18 +87,18 @@
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>
-                <input bind:value={newScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
+                <input required bind:value={newScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
             </div>
         </div>
 
         <label class="my-3" for="classroom">Classoom</label>
-        <input bind:value={newScheduleEntry.classroom} id="classroom" class="p-2 bg-alt" type="text" />
+        <input required bind:value={newScheduleEntry.classroom} id="classroom" class="p-2 bg-alt" type="text" />
 
         <label class="my-3" for="lecturer">Lecturer(s)</label>
-        <input bind:value={newScheduleEntry.lecturer} id="lecturer" class="p-2 bg-alt" type="text" />
+        <input required bind:value={newScheduleEntry.lecturer} id="lecturer" class="p-2 bg-alt" type="text" />
 
         <div class="my-3">
-            <input class="p-2 px-4 w-24 rounded bg-alt" type="submit" value="Create" />
+            <button class="p-2 px-4 w-24 rounded bg-alt" type="submit">Create</button>
         </div>
     </form>
 </Modal>

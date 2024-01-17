@@ -8,15 +8,14 @@
 
     async function handleEdit(e: MouseEvent) {
         const target = e.target as HTMLButtonElement
-        const dayIdx = parseInt(target.dataset.dayIdx!)
-        const entryIdx = parseInt(target.dataset.entry!)
+        const scheduleId = parseInt(target.dataset.scheduleId!)
 
         const host = getHost(window)
-        const res = await fetch(`${host}/api/schedule/${dayIdx}/entry/${entryIdx}`)
+        const res = await fetch(`${host}/api/schedule/${scheduleId}`)
         const resData = (await res.json()).data
 
-        currScheduleEntry = resData.schedule
-        showFormModal = true
+        currScheduleEntry = resData.entry
+        showUpdateModal = true
     }
 </script>
 
@@ -32,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            {#each schedule[currentDay] as scheduleEntry, idx}
+            {#each schedule[currentDay] as scheduleEntry (scheduleEntry.id)}
                 {@const lecturers = scheduleEntry.lecturer.split("/")}
                 <tr>
                     <td class="p-3 text-center border b-secondary"
@@ -51,10 +50,8 @@
                             <button
                                 on:click={handleEdit}
                                 class="py-2 px-5 rounded bg-alt"
-                                data-day-idx={currentDay}
-                                data-entry={idx}>Edit</button>
-                            <button class="py-2 px-3 rounded bg-alt" data-day-idx={currentDay} data-entry={idx}
-                                >Delete</button>
+                                data-schedule-id={scheduleEntry.id}>Edit</button>
+                            <button class="py-2 px-3 rounded bg-alt" data-schedule-id={scheduleEntry.id}>Delete</button>
                         </div>
                     </td>
                 </tr>

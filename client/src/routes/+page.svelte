@@ -21,21 +21,21 @@
         day: 0,
     }
 
-    const getSchedule = async () => {
+    const fetchSchedule = async () => {
         const host = getHost(window)
-        return await fetch(`${host}/api/schedule`).then((res) => res.json())
+
+        const res = await fetch(`${host}/api/schedule`).then((res) => res.json())
+        schedule = res.data
     }
 
-    onMount(() => {
-        getSchedule().then((res) => {
-            schedule = res.data
-            loading = false
-        })
+    onMount(async () => {
+        await fetchSchedule()
+        loading = false
     })
 </script>
 
-<UpdateFormModal bind:showUpdateModal bind:currScheduleEntry />
-<CreateFormModal bind:currentDay bind:showCreateModal />
+<UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
+<CreateFormModal on:fetchSchedule={fetchSchedule} bind:currentDay bind:showCreateModal />
 
 <button on:click={() => (showCreateModal = true)} class="">Create</button>
 <main class="flex flex-col justify-center items-center mt-15">
@@ -44,6 +44,6 @@
     {#if loading}
         <p>Loading...</p>
     {:else}
-        <ScheduleTable bind:currScheduleEntry bind:showUpdateModal {currentDay} {schedule} />
+        <ScheduleTable bind:currScheduleEntry bind:showUpdateModal {currentDay} bind:schedule />
     {/if}
 </main>
