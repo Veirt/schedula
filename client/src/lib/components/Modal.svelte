@@ -9,10 +9,13 @@
     }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <dialog
     class="p-8 w-full text-white rounded backdrop:backdrop-blur-sm bg-primary md:w-3xl"
     bind:this={dialog}
-    on:close={() => (showModal = false)}>
+    on:close={() => (showModal = false)}
+    on:click|self={() => dialog.close()}>
     <div class="flex flex-row justify-between items-center border-b-2 b-secondary">
         <slot name="title" />
         <div class="p-2">x</div>
