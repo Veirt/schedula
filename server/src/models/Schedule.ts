@@ -54,16 +54,16 @@ export class Schedule {
     }
 
     static getAll() {
-        return db.query("SELECT * FROM schedule").all()
+        return db.query<ScheduleEntry, null>("SELECT * FROM schedule ORDER BY startTime").all(null)
     }
 
     /*
        Group by day. 
     */
     static getGroupedByDay() {
-        let schedule = this.getAll() as Schedule[]
+        let schedule = this.getAll()
 
-        const groupedSchedule: Schedule[][] = [[], [], [], [], [], [], []]
+        const groupedSchedule: ScheduleEntry[][] = [[], [], [], [], [], [], []]
         schedule.forEach((item) => {
             if (groupedSchedule[item.day]) {
                 groupedSchedule[item.day].push(item)
