@@ -5,6 +5,7 @@
     import CreateFormModal from "$lib/components/CreateFormModal.svelte"
     import { onMount } from "svelte"
     import { getHost } from "$lib/utils/host"
+    import NavBar from "$lib/components/NavBar.svelte"
 
     let loading = true
     let currentDay = new Date().getDay()
@@ -35,10 +36,11 @@
     })
 </script>
 
+<NavBar bind:showCreateModal />
+
 <UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
 <CreateFormModal on:fetchSchedule={fetchSchedule} bind:showCreateModal bind:currentDay />
 
-<button on:click={() => (showCreateModal = true)} class="">Create</button>
 <main class="flex flex-col justify-center items-center mt-15">
     <h1 class="text-3xl">Schedule</h1>
     <WeekDayView bind:currentDay />
