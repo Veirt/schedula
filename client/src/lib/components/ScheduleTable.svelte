@@ -3,6 +3,7 @@
     import { getHost } from "$lib/utils/host"
     import axios from "axios"
     import { createEventDispatcher } from "svelte"
+    import { isLoggedIn } from "$lib/store/auth"
 
     export let currentDay: number
     export let showUpdateModal: boolean
@@ -26,7 +27,7 @@
         showUpdateModal = true
     }
 
-    async function handleDelete(e: CustomEvent) {
+    async function handleDelete() {
         const host = getHost(window)
         const res = await axios.delete(`${host}/api/schedule/${scheduleId}`)
 
@@ -46,7 +47,9 @@
                 <td class="p-3 border b-secondary min-w-25">Classroom</td>
                 <td class="p-3 border b-secondary min-w-50 w-50">Course</td>
                 <td class="p-3 border b-secondary min-w-50">Lecturer(s)</td>
-                <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
+                {#if $isLoggedIn}
+                    <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
+                {/if}
             </tr>
         </thead>
         <tbody>
@@ -64,23 +67,26 @@
                             {/each}
                         </div>
                     </td>
-                    <td class="p-3 border b-secondary">
-                        <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
-                            <button
-                                on:click={(e) => {
-                                    scheduleId = scheduleEntry.id
-                                    handleEdit(e)
-                                }}
-                                class="py-2 px-5 rounded bg-alt"
-                                data-schedule-id={scheduleEntry.id}>Edit</button>
-                            <button
-                                on:click={() => {
-                                    scheduleId = scheduleEntry.id
-                                    showConfirmModal = true
-                                }}
-                                class="py-2 px-3 rounded bg-alt">Delete</button>
-                        </div>
-                    </td>
+
+                    {#if $isLoggedIn}
+                        <td class="p-3 border b-secondary">
+                            <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
+                                <button
+                                    on:click={(e) => {
+                                        scheduleId = scheduleEntry.id
+                                        handleEdit(e)
+                                    }}
+                                    class="py-2 px-5 rounded bg-alt"
+                                    data-schedule-id={scheduleEntry.id}>Edit</button>
+                                <button
+                                    on:click={() => {
+                                        scheduleId = scheduleEntry.id
+                                        showConfirmModal = true
+                                    }}
+                                    class="py-2 px-3 rounded bg-alt">Delete</button>
+                            </div>
+                        </td>
+                    {/if}
                 </tr>
             {/each}
         </tbody>

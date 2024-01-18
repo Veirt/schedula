@@ -1,11 +1,16 @@
 import { Hono } from "hono"
+import { jwt } from "hono/jwt"
+import { setCookie, getCookie } from "hono/cookie"
 import { cors } from "hono/cors"
+import jsonwebtoken from "jsonwebtoken"
+import { Account } from "./models/Account"
 import { Schedule } from "./models/Schedule"
 
 const app = new Hono()
 app.use("/api/*", cors())
 
 Schedule.init()
+Account.init()
 
 app.get("/api/schedule", (c) => {
     return c.json({ data: Schedule.getGroupedByDay() })
@@ -131,6 +136,95 @@ app.get("/api/schedule/day/:day", (c) => {
             schedule: Schedule.get({ day }),
         },
     })
+})
+
+// auth
+app.get("/oauth/discord/callback", async (c) => {
+    const code = c.req.query("code")
+
+    if (!code) {
+        return c.json({ error: "invlaid request" }, 400)
+    }
+
+    const body = new URLSearchParams({
+        client_id: Bun.env.DISCORD_OAUTH_CLIENT_ID!,
+        client_secret: Bun.env.DISCORD_OAUTH_CLIENT_SECRET!,
+        redirect_uri: Bun.env.DISCORD_OAUTH_REDIRECT_URI!,
+        grant_type: "authorization_code",
+        code,
+    })
+
+    const res = await fetch("https://discord.com/api/oauth2/token", { method: "POST", body })
+    const authData = (await res.json()) as { access_token: string; refresh_token: string }
+
+    if (!authData.access_token || !authData.refresh_token) {
+        return c.json({ error: "invalid code" }, 400)
+    }
+
+    const userRes = await fetch("https://discord.com/api/users/@me", {
+        headers: {
+            authorization: `Bearer ${authData.access_token}`,
+        },
+    })
+
+    const userData = await userRes.json()
+
+    const userServerRes = await fetch("https://discord.com/api/users/@me/guilds", {
+        headers: {
+            authorization: `Bearer ${authData.access_token}`,
+        },
+    })
+    const userServerData = await userServerRes.json()
+
+    const isUserInServer = userServerData.find((s: { id: string }) => s.id === Bun.env.DISCORD_SERVER_ID)
+    if (!isUserInServer) {
+        return c.json({ error: "You are not in the server. You are not allowed to use this web." }, 403)
+    }
+
+    const account = new Account({
+        id: userData.id,
+        name: userData.global_name,
+        avatar: userData.avatar,
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token,
+    })
+    account.insertOrUpdate()
+
+    const token = jsonwebtoken.sign({ id: account.id, name: account.name }, Bun.env.JWT_SECRET!)
+
+    setCookie(c, "jwt", token)
+    return c.redirect(Bun.env.CLIENT_URL!)
+})
+
+app.get("/oauth/discord", (c) => {
+    return c.redirect(
+        `https://discordapp.com/api/oauth2/authorize?client_id=${Bun.env.DISCORD_OAUTH_CLIENT_ID}&redirect_uri=${Bun.env.DISCORD_OAUTH_REDIRECT_URI}&response_type=code&scope=guilds+identify`,
+    )
+})
+
+app.use(
+    "/api/*",
+    jwt({
+        secret: Bun.env.JWT_SECRET!,
+        cookie: "jwt",
+    }),
+)
+
+app.get("/api/accounts/@me", async (c) => {
+    const payload = c.get("jwtPayload")
+
+    const account = Account.getFirst({ id: payload.id })
+    if (!account) {
+        return c.json({ error: "Unauthorized" }, 401)
+    }
+
+    return c.json({ data: { account } })
+})
+
+app.post("/api/auth/logout", (c) => {
+    setCookie(c, "jwt", "", { maxAge: 0 })
+
+    return c.json({}, 204)
 })
 
 export default app
