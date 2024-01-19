@@ -3,7 +3,7 @@ type ScheduleEntry = {
     course: string
     classroom: string
     lecturer: string
-    startTime: string
-    endTime: string
+    start_time: string
+    end_time: string
     day: number
 }

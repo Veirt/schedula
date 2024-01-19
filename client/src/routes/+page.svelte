@@ -17,8 +17,8 @@
         classroom: "",
         course: "",
         lecturer: "",
-        startTime: "",
-        endTime: "",
+        start_time: "",
+        end_time: "",
         day: 0,
     }
 

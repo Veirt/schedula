@@ -15,10 +15,10 @@
 
         const host = getHost(window)
 
-        const { id, course, day, startTime, endTime, classroom, lecturer } = currScheduleEntry
+        const { id, course, day, start_time, end_time, classroom, lecturer } = currScheduleEntry
         const res = await axios.patch(
             `${host}/api/schedule/${id}`,
-            { course, day, startTime, endTime, classroom, lecturer },
+            { course, day, start_time, end_time, classroom, lecturer },
             {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -49,14 +49,14 @@
                 <label for="time-start">Start</label>
                 <input
                     required
-                    bind:value={currScheduleEntry.startTime}
+                    bind:value={currScheduleEntry.start_time}
                     id="time-start"
                     class="p-2 bg-alt"
                     type="text" />
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>
-                <input required bind:value={currScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
+                <input required bind:value={currScheduleEntry.end_time} id="time-end" class="p-2 bg-alt" type="text" />
             </div>
         </div>
 

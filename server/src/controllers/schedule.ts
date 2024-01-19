@@ -24,11 +24,11 @@ export const createScheduleEntry = async (c: Context) => {
         return c.json({ error: "Expected lecturer(s) to be a string" }, 400)
     }
 
-    if (typeof body.startTime !== "string") {
+    if (typeof body.start_time !== "string") {
         return c.json({ error: "Expected start time to be a string" }, 400)
     }
 
-    if (typeof body.endTime !== "string") {
+    if (typeof body.end_time !== "string") {
         return c.json({ error: "Expected start time to be a string" }, 400)
     }
 
@@ -36,8 +36,8 @@ export const createScheduleEntry = async (c: Context) => {
         course: body.course,
         classroom: body.classroom,
         lecturer: body.lecturer,
-        startTime: body.startTime,
-        endTime: body.endTime,
+        start_time: body.start_time,
+        end_time: body.end_time,
         day: parseInt(body.day),
     })
 
@@ -75,8 +75,8 @@ export const updateScheduleEntryById = async (c: Context) => {
     }
 
     entry.day = !isNaN(parseInt(body.day as string)) ? parseInt(body.day as string) : entry.day
-    entry.startTime = (body.startTime as string) || entry.startTime
-    entry.endTime = (body.endTime as string) || entry.endTime
+    entry.start_time = (body.start_time as string) || entry.start_time
+    entry.end_time = (body.end_time as string) || entry.end_time
     entry.classroom = (body.classroom as string) || entry.classroom
     entry.lecturer = (body.lecturer as string) || entry.lecturer
 

@@ -57,7 +57,7 @@
                 {@const lecturers = scheduleEntry.lecturer.split("/")}
                 <tr>
                     <td class="p-3 text-center border b-secondary"
-                        >{scheduleEntry.startTime} - {scheduleEntry.endTime}</td>
+                        >{scheduleEntry.start_time} - {scheduleEntry.end_time}</td>
                     <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
                     <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
                     <td class="p-3 border text-[12px] b-secondary">

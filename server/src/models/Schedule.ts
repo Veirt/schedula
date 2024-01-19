@@ -5,8 +5,8 @@ export type ScheduleEntry = {
     course: string
     classroom: string
     lecturer: string
-    startTime: string
-    endTime: string
+    start_time: string
+    end_time: string
     day: number
 }
 
@@ -15,8 +15,8 @@ type ScheduleEntryParams = {
     $course: string
     $classroom: string
     $lecturer: string
-    $startTime: string
-    $endTime: string
+    $start_time: string
+    $end_time: string
     $day: number
 }
 
@@ -25,17 +25,17 @@ export class Schedule {
     course: string
     classroom: string
     lecturer: string
-    startTime: string
-    endTime: string
+    start_time: string
+    end_time: string
     day: number
 
-    constructor({ id, course, classroom, lecturer, startTime, endTime, day }: ScheduleEntry) {
+    constructor({ id, course, classroom, lecturer, start_time, end_time, day }: ScheduleEntry) {
         this.id = id
         this.course = course
         this.classroom = classroom
         this.lecturer = lecturer
-        this.startTime = startTime
-        this.endTime = endTime
+        this.start_time = start_time
+        this.end_time = end_time
         this.day = day
     }
 
@@ -46,15 +46,15 @@ export class Schedule {
                 course TEXT,
                 classroom TEXT,
                 lecturer TEXT,
-                startTime TEXT,
-                endTime TEXT,
+                start_time TEXT,
+                end_time TEXT,
                 day INTEGER
              )`,
         )
     }
 
     static getAll() {
-        return db.query<ScheduleEntry, null>("SELECT * FROM schedule ORDER BY startTime").all(null)
+        return db.query<ScheduleEntry, null>("SELECT * FROM schedule ORDER BY start_time").all(null)
     }
 
     /*
@@ -77,7 +77,15 @@ export class Schedule {
         // schedule.map
     }
 
-    static getFirst({ id, course, classroom, lecturer, startTime, endTime, day }: Partial<ScheduleEntry>) {
+    static getFirst({
+        id,
+        course,
+        classroom,
+        lecturer,
+        start_time: start_time,
+        end_time: end_time,
+        day,
+    }: Partial<ScheduleEntry>) {
         return db
             .query<ScheduleEntry, Partial<ScheduleEntryParams>>(
                 `SELECT * FROM schedule
@@ -85,8 +93,8 @@ export class Schedule {
                  course = $course OR
                  classroom = $classroom OR
                  lecturer = $lecturer OR
-                 startTime = $startTime OR
-                 endTime = $endTime OR
+                 start_time = $start_time OR
+                 end_time = $end_time OR
                  day = $day`,
             )
             .get({
@@ -94,13 +102,21 @@ export class Schedule {
                 $course: course,
                 $classroom: classroom,
                 $lecturer: lecturer,
-                $startTime: startTime,
-                $endTime: endTime,
+                $start_time: start_time,
+                $end_time: end_time,
                 $day: day,
             })
     }
 
-    static get({ id, course, classroom, lecturer, startTime, endTime, day }: Partial<ScheduleEntry>) {
+    static get({
+        id,
+        course,
+        classroom,
+        lecturer,
+        start_time: start_time,
+        end_time: end_time,
+        day,
+    }: Partial<ScheduleEntry>) {
         return db
             .query(
                 `SELECT * FROM schedule
@@ -108,24 +124,24 @@ export class Schedule {
                  course = $coures OR
                  classroom = $classroom OR
                  lecturer = $lecturer OR
-                 startTime = $startTime OR
-                 endTime = $endTime OR
+                 start_time = $start_time OR
+                 end_time = $end_time OR
                  day = $day`,
             )
-            .all(id!, course!, classroom!, lecturer!, startTime!, endTime!, day!)
+            .all(id!, course!, classroom!, lecturer!, start_time!, end_time!, day!)
     }
 
     insert() {
         const query = db.query(
-            "INSERT INTO schedule (course, classroom, lecturer, startTime, endTime, day) VALUES ($course, $classroom, $lecturer, $startTime, $endTime, $day)",
+            "INSERT INTO schedule (course, classroom, lecturer, start_time, end_time, day) VALUES ($course, $classroom, $lecturer, $start_time, $end_time, $day)",
         )
 
         query.run({
             $course: this.course,
             $classroom: this.classroom,
             $lecturer: this.lecturer,
-            $startTime: this.startTime,
-            $endTime: this.endTime,
+            $start_time: this.start_time,
+            $end_time: this.end_time,
             $day: this.day,
         })
     }
@@ -136,8 +152,8 @@ export class Schedule {
                  course = $course, 
                  classroom = $classroom, 
                  lecturer = $lecturer, 
-                 startTime = $startTime, 
-                 endTime = $endTime, 
+                 start_time = $start_time, 
+                 end_time = $end_time, 
                  day = $day 
                  WHERE id = $id`,
         )
@@ -146,8 +162,8 @@ export class Schedule {
             $course: this.course,
             $classroom: this.classroom,
             $lecturer: this.lecturer,
-            $startTime: this.startTime,
-            $endTime: this.endTime,
+            $start_time: this.start_time,
+            $end_time: this.end_time,
             $day: this.day,
         })
     }
