@@ -1,7 +1,7 @@
 import { Context } from "hono"
 import { setCookie } from "hono/cookie"
-import jsonwebtoken from "jsonwebtoken"
-import { DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI, DISCORD_SERVER_ID } from "../config/env"
+import { sign } from "hono/jwt"
+import { DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI, DISCORD_SERVER_ID, JWT_SECRET } from "../config/env"
 import { Account } from "../models/Account"
 
 export const discordCallback = async (c: Context) => {
@@ -36,8 +36,7 @@ export const discordCallback = async (c: Context) => {
     })
     account.insertOrUpdate()
 
-    const token = jsonwebtoken.sign({ id: account.id, name: account.name }, Bun.env.JWT_SECRET!)
-
+    const token = await sign({ id: account.id, name: account.name }, JWT_SECRET)
     setCookie(c, "jwt", token)
     return c.redirect(Bun.env.CLIENT_URL!)
 }
