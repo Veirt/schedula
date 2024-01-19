@@ -1,12 +1,10 @@
 <script lang="ts">
     import { account, isLoggedIn } from "$lib/store/auth"
-    import { getHost } from "$lib/utils/host"
-    import axios from "axios"
+    import axios from "$lib/axios"
     import { onMount } from "svelte"
 
     onMount(async () => {
         const res = await axios.get("/api/auth/@me", {
-            baseURL: getHost(window),
             withCredentials: true,
             validateStatus: function (status) {
                 return status < 500 // Resolve only if the status code is less than 500

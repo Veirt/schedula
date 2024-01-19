@@ -1,8 +1,7 @@
 <script lang="ts">
+    import axios from "$lib/axios"
     import Modal from "$lib/components/Modal.svelte"
     import { days } from "$lib/utils/day"
-    import { getHost } from "$lib/utils/host"
-    import axios from "axios"
     import dayjs from "dayjs"
     import { createEventDispatcher } from "svelte"
 
@@ -23,9 +22,7 @@
     $: newScheduleEntry.day = currentDay
 
     async function createScheduleEntry() {
-        const host = getHost(window)
-
-        const res = await axios.post(`${host}/api/schedule`, newScheduleEntry, {
+        const res = await axios.post("/api/schedule", newScheduleEntry, {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },

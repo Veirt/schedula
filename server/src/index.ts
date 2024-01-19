@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { checkRequiredVariables } from "./config/env"
+import { CLIENT_URL, checkRequiredVariables } from "./config/env"
 import { Account } from "./models/Account"
 import { Schedule } from "./models/Schedule"
 import { ScheduleChanges } from "./models/ScheduleChanges"
@@ -11,7 +11,11 @@ import scheduleRouter from "./routes/schedule"
 checkRequiredVariables()
 
 const app = new Hono()
-app.use("/api/*", cors())
+if (process.env.NODE_ENV === "development") {
+    app.use("/api/*", cors())
+} else {
+    app.use("/api/*", cors({ credentials: true, origin: CLIENT_URL }))
+}
 
 Schedule.init()
 ScheduleChanges.init()

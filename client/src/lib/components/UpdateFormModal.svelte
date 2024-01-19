@@ -1,8 +1,7 @@
 <script lang="ts">
+    import axios from "$lib/axios"
     import Modal from "$lib/components/Modal.svelte"
     import { days } from "$lib/utils/day"
-    import { getHost } from "$lib/utils/host"
-    import axios from "axios"
     import { createEventDispatcher } from "svelte"
 
     export let showUpdateModal: boolean
@@ -11,13 +10,9 @@
     const dispatch = createEventDispatcher()
 
     async function updateScheduleEntry() {
-        console.log(currScheduleEntry)
-
-        const host = getHost(window)
-
         const { id, course, day, start_time, end_time, classroom, lecturer } = currScheduleEntry
         const res = await axios.patch(
-            `${host}/api/schedule/${id}`,
+            `/api/schedule/${id}`,
             { course, day, start_time, end_time, classroom, lecturer },
             {
                 headers: {

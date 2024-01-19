@@ -1,9 +1,8 @@
 <script lang="ts">
     import ConfirmModal from "$lib/components/ConfirmModal.svelte"
-    import { getHost } from "$lib/utils/host"
-    import axios from "axios"
     import { createEventDispatcher } from "svelte"
     import { isLoggedIn } from "$lib/store/auth"
+    import axios from "$lib/axios"
 
     export let currentDay: number
     export let showUpdateModal: boolean
@@ -19,17 +18,14 @@
         const target = e.target as HTMLButtonElement
         const scheduleId = parseInt(target.dataset.scheduleId!)
 
-        const host = getHost(window)
-        const res = await fetch(`${host}/api/schedule/${scheduleId}`)
-        const resData = (await res.json()).data
+        const res = await axios.get(`/api/schedule/${scheduleId}`)
 
-        currScheduleEntry = resData.entry
+        currScheduleEntry = res.data.data.entry
         showUpdateModal = true
     }
 
     async function handleDelete() {
-        const host = getHost(window)
-        const res = await axios.delete(`${host}/api/schedule/${scheduleId}`)
+        const res = await axios.delete(`/api/schedule/${scheduleId}`)
 
         if (res.status === 204) {
             dispatch("fetchSchedule")
@@ -62,7 +58,7 @@
                     <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
                     <td class="p-3 border text-[12px] b-secondary">
                         <div class="flex flex-col">
-                            {#each lecturers as lecturer (lecturer)}
+                            {#each lecturers as lecturer}
                                 <span class="p-1 my-1 rounded bg-alt">{lecturer}</span>
                             {/each}
                         </div>

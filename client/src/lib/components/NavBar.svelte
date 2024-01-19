@@ -1,8 +1,7 @@
 <script lang="ts">
     import { account, isLoggedIn } from "$lib/store/auth"
     import { PUBLIC_SERVER_URL } from "$env/static/public"
-    import axios from "axios"
-    import { getHost } from "$lib/utils/host"
+    import axios from "$lib/axios"
 
     export let showCreateModal: boolean
 
@@ -23,8 +22,7 @@
     }
 
     async function handleLogout() {
-        const host = getHost(window)
-        await axios.post(`${host}/api/auth/logout`, null, { withCredentials: true })
+        await axios.post(`/api/auth/logout`, null)
 
         account.set({ id: "", username: "", avatar: "" })
         isLoggedIn.set(false)

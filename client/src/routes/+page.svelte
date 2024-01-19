@@ -5,7 +5,7 @@
     import CreateFormModal from "$lib/components/CreateFormModal.svelte"
     import NavBar from "$lib/components/NavBar.svelte"
     import { onMount } from "svelte"
-    import { getHost } from "$lib/utils/host"
+    import axios from "$lib/axios"
 
     let loading = true
     let currentDay = new Date().getDay()
@@ -23,10 +23,9 @@
     }
 
     const fetchSchedule = async () => {
-        const host = getHost(window)
+        const res = await axios.get("/api/schedule")
 
-        const res = await fetch(`${host}/api/schedule`).then((res) => res.json())
-        schedule = res.data
+        schedule = res.data.data
     }
 
     onMount(async () => {
