@@ -3,15 +3,14 @@
     import WeekDayView from "$lib/components/WeekDayView.svelte"
     import UpdateFormModal from "$lib/components/UpdateFormModal.svelte"
     import CreateFormModal from "$lib/components/CreateFormModal.svelte"
+    import NavBar from "$lib/components/NavBar.svelte"
     import { onMount } from "svelte"
     import { getHost } from "$lib/utils/host"
-    import NavBar from "$lib/components/NavBar.svelte"
 
     let loading = true
     let currentDay = new Date().getDay()
     let schedule: never[][] = []
 
-    let showConfirmModal = true
     let showCreateModal = false
     let showUpdateModal = false
     let currScheduleEntry: ScheduleEntry = {
