@@ -21,14 +21,22 @@ export class Schedule {
     start_time: string
     end_time: string
     day: number
-    constructor({ id, course, classroom, lecturer, start_time, end_time, day }: Schedule) {
-        this.id = id
-        this.course = course
-        this.classroom = classroom
-        this.lecturer = lecturer
-        this.start_time = start_time
-        this.end_time = end_time
-        this.day = day
+    constructor(schedule: {
+        id?: number
+        course: string
+        classroom: string
+        lecturer: string
+        start_time: string
+        end_time: string
+        day: number
+    }) {
+        this.id = schedule.id
+        this.course = schedule.course
+        this.classroom = schedule.classroom
+        this.lecturer = schedule.lecturer
+        this.start_time = schedule.start_time
+        this.end_time = schedule.end_time
+        this.day = schedule.day
     }
 
     static init() {

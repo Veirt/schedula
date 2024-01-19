@@ -16,7 +16,7 @@ export class Account {
     avatar: string
     access_token: string
     refresh_token: string
-    constructor(account: Account) {
+    constructor(account: { id: string; name: string; avatar: string; access_token: string; refresh_token: string }) {
         this.id = account.id
         this.name = account.name
         this.avatar = account.avatar
