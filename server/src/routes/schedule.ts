@@ -1,4 +1,6 @@
 import { Hono } from "hono"
+import { jwt } from "hono/jwt"
+import { JWT_SECRET } from "../config/env"
 import {
     createScheduleEntry,
     deleteScheduleEntryById,
@@ -7,14 +9,13 @@ import {
     getScheduleGroupedByDay,
     updateScheduleEntryById,
 } from "../controllers/schedule"
-import { JWT_SECRET } from "../config/env"
-import { jwt } from "hono/jwt"
 
 // /api/schedule
 const scheduleRouter = new Hono()
 scheduleRouter.use("/*", (c, next) => {
     const jwtMiddleware = jwt({
         secret: JWT_SECRET,
+        cookie: "jwt",
     })
 
     // only allow get requests without jwt
