@@ -1,20 +1,22 @@
 import db from "../db"
 
-export type AccountType = {
-    id: string
-    name: string
-    avatar: string
-    access_token: string
-    refresh_token: string
+type AccountParams = {
+    $id: string
+    $name: string
+    $avatar: string
+    $access_token: string
+    $refresh_token: string
 }
+
+type GetFirstAccountParams = Partial<AccountParams>
 
 export class Account {
     id: string
     name: string
     avatar: string
-    private access_token: string
-    private refresh_token: string
-    constructor(account: AccountType) {
+    access_token: string
+    refresh_token: string
+    constructor(account: Account) {
         this.id = account.id
         this.name = account.name
         this.avatar = account.avatar
@@ -44,12 +46,18 @@ export class Account {
         )
     }
 
-    static getFirst({ id, name, avatar, access_token, refresh_token }: Partial<AccountType>) {
+    static getFirst({ id, name, avatar, access_token, refresh_token }: Partial<Account>) {
         const result = db
-            .query(
-                "SELECT * FROM accounts WHERE id = ? OR name = ? OR avatar = ? OR access_token = ? OR refresh_token = ?",
+            .query<Account, Partial<GetFirstAccountParams>>(
+                "SELECT * FROM accounts WHERE id = $id OR name = $name OR avatar = $avatar OR access_token = $access_token OR refresh_token = $refresh_token",
             )
-            .get(id!, name!, avatar!, access_token!, refresh_token!)
+            .get({
+                $id: id!,
+                $name: name!,
+                $avatar: avatar!,
+                $access_token: access_token!,
+                $refresh_token: refresh_token!,
+            })
 
         return result
     }

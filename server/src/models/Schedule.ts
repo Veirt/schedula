@@ -1,15 +1,5 @@
 import db from "../db"
 
-export type ScheduleEntry = {
-    id?: number
-    course: string
-    classroom: string
-    lecturer: string
-    start_time: string
-    end_time: string
-    day: number
-}
-
 type ScheduleEntryParams = {
     $id: number
     $course: string
@@ -20,16 +10,18 @@ type ScheduleEntryParams = {
     $day: number
 }
 
+type GetScheduleEntryParams = Partial<ScheduleEntryParams>
+type InsertScheduleEntryParams = Omit<ScheduleEntryParams, "$id">
+
 export class Schedule {
-    private id?: number
+    id?: number
     course: string
     classroom: string
     lecturer: string
     start_time: string
     end_time: string
     day: number
-
-    constructor({ id, course, classroom, lecturer, start_time, end_time, day }: ScheduleEntry) {
+    constructor({ id, course, classroom, lecturer, start_time, end_time, day }: Schedule) {
         this.id = id
         this.course = course
         this.classroom = classroom
@@ -54,7 +46,7 @@ export class Schedule {
     }
 
     static getAll() {
-        return db.query<ScheduleEntry, null>("SELECT * FROM schedule ORDER BY start_time").all(null)
+        return db.query<Schedule, null>("SELECT * FROM schedule ORDER BY start_time").all(null)
     }
 
     /*
@@ -63,7 +55,7 @@ export class Schedule {
     static getGroupedByDay() {
         let schedule = this.getAll()
 
-        const groupedSchedule: ScheduleEntry[][] = [[], [], [], [], [], [], []]
+        const groupedSchedule: Schedule[][] = [[], [], [], [], [], [], []]
         schedule.forEach((item) => {
             if (groupedSchedule[item.day]) {
                 groupedSchedule[item.day].push(item)
@@ -73,8 +65,6 @@ export class Schedule {
         })
 
         return groupedSchedule
-
-        // schedule.map
     }
 
     static getFirst({
@@ -85,9 +75,9 @@ export class Schedule {
         start_time: start_time,
         end_time: end_time,
         day,
-    }: Partial<ScheduleEntry>) {
+    }: Partial<Schedule>) {
         return db
-            .query<ScheduleEntry, Partial<ScheduleEntryParams>>(
+            .query<Schedule, Partial<ScheduleEntryParams>>(
                 `SELECT * FROM schedule
                  WHERE id = $id OR
                  course = $course OR
@@ -116,27 +106,34 @@ export class Schedule {
         start_time: start_time,
         end_time: end_time,
         day,
-    }: Partial<ScheduleEntry>) {
+    }: Partial<Schedule>) {
         return db
-            .query(
+            .query<Schedule, GetScheduleEntryParams>(
                 `SELECT * FROM schedule
                  WHERE id = $id OR
-                 course = $coures OR
+                 course = $course OR
                  classroom = $classroom OR
                  lecturer = $lecturer OR
                  start_time = $start_time OR
                  end_time = $end_time OR
-                 day = $day`,
+                 day = $day
+            `,
             )
-            .all(id!, course!, classroom!, lecturer!, start_time!, end_time!, day!)
+            .all({
+                $id: id,
+                $course: course,
+                $classroom: classroom,
+                $lecturer: lecturer,
+                $start_time: start_time,
+                $end_time: end_time,
+                $day: day,
+            })
     }
 
     insert() {
-        const query = db.query(
+        db.query<null, InsertScheduleEntryParams>(
             "INSERT INTO schedule (course, classroom, lecturer, start_time, end_time, day) VALUES ($course, $classroom, $lecturer, $start_time, $end_time, $day)",
-        )
-
-        query.run({
+        ).run({
             $course: this.course,
             $classroom: this.classroom,
             $lecturer: this.lecturer,
