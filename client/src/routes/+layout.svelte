@@ -5,7 +5,7 @@
     import { onMount } from "svelte"
 
     onMount(async () => {
-        const res = await axios.get("/api/accounts/@me", {
+        const res = await axios.get("/api/auth/@me", {
             baseURL: getHost(window),
             withCredentials: true,
             validateStatus: function (status) {
