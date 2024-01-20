@@ -2,3 +2,5 @@ node_modules
 schedule.json
 *.sqlite
 .env
+.env.*
+!.env.example
