@@ -23,6 +23,6 @@ Account.init()
 
 app.route("/api/schedule", scheduleRouter)
 app.route("/api/auth", authRouter)
-app.route("/oauth", oauthRouter)
+app.route("/api/oauth", oauthRouter)
 
 export default app

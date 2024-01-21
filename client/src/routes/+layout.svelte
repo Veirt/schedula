@@ -21,6 +21,10 @@
     })
 </script>
 
-<body class="text-white bg-primary">
-    <slot />
-</body>
+<slot />
+
+<style lang="postcss">
+    :global(body) {
+        @apply bg-primary text-white;
+    }
+</style>

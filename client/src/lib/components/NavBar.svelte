@@ -55,7 +55,7 @@
             </div>
         {:else}
             <button class:invisible={$isLoggedIn == null} class="py-2 px-5 rounded bg-alt">
-                <a href={`${PUBLIC_SERVER_URL}/oauth/discord`}>Login</a>
+                <a href={`${PUBLIC_SERVER_URL ? PUBLIC_SERVER_URL : ""}/api/oauth/discord`}>Login</a>
             </button>
         {/if}
     </div>

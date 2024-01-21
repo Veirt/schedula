@@ -1,7 +1,13 @@
 import { Context } from "hono"
 import { setCookie } from "hono/cookie"
 import { sign } from "hono/jwt"
-import { DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI, DISCORD_SERVER_ID, JWT_SECRET } from "../config/env"
+import {
+    DISCORD_OAUTH_CLIENT_ID,
+    DISCORD_OAUTH_CLIENT_SECRET,
+    DISCORD_OAUTH_REDIRECT_URI,
+    DISCORD_SERVER_ID,
+    JWT_SECRET,
+} from "../config/env"
 import { Account } from "../models/Account"
 
 export const discordCallback = async (c: Context) => {
@@ -23,7 +29,7 @@ export const discordCallback = async (c: Context) => {
         return c.json({ error: "failed getting user data" }, 500)
     }
 
-    if (!isUserInServer(authData.access_token)) {
+    if (!(await isUserInServer(authData.access_token))) {
         return c.json({ error: "You are not in the server. You are not allowed to use this web." }, 403)
     }
 
@@ -53,9 +59,9 @@ export const redirectToDiscordOAuth = (c: Context) => {
 
 const getTokens = async (code: string) => {
     const body = new URLSearchParams({
-        client_id: Bun.env.DISCORD_OAUTH_CLIENT_ID!,
-        client_secret: Bun.env.DISCORD_OAUTH_CLIENT_SECRET!,
-        redirect_uri: Bun.env.DISCORD_OAUTH_REDIRECT_URI!,
+        client_id: DISCORD_OAUTH_CLIENT_ID,
+        client_secret: DISCORD_OAUTH_CLIENT_SECRET,
+        redirect_uri: DISCORD_OAUTH_REDIRECT_URI,
         grant_type: "authorization_code",
         code,
     })
