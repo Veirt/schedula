@@ -1,4 +1,18 @@
+import { add, eachDayOfInterval, format, startOfISOWeek } from "date-fns"
 import db from "../db"
+import { ScheduleChangeInterface } from "./ScheduleChanges"
+
+interface ScheduleInterface {
+    id?: number
+    course: string
+    classroom: string
+    lecturer: string
+    start_time: string
+    end_time: string
+    date?: string
+    type?: string
+    day: number
+}
 
 type ScheduleEntryParams = {
     $id: number
@@ -12,6 +26,71 @@ type ScheduleEntryParams = {
 
 type GetScheduleEntryParams = Partial<ScheduleEntryParams>
 type InsertScheduleEntryParams = Omit<ScheduleEntryParams, "$id">
+type GetThisWeekParams = {
+    $start_of_week: string
+    $end_of_week: string
+}
+
+function groupByDay(schedule: ScheduleInterface[]) {
+    const groupedSchedule: ScheduleInterface[][] = [[], [], [], [], [], [], []]
+    schedule.forEach((item) => {
+        if (groupedSchedule[item.day]) {
+            groupedSchedule[item.day].push(item)
+        } else {
+            groupedSchedule[item.day] = [item]
+        }
+    })
+
+    return groupedSchedule
+}
+
+function applyScheduleChanges(
+    schedule: ScheduleInterface[][],
+    scheduleChanges: ScheduleChangeInterface[],
+    daysOfWeekFormatted: string[],
+) {
+    // Tipe Perubahan jadwal:
+    // 1. Cancellation: Misalnya ada jadwal yang dibatalkan. Maka ambil scheduled_date nya, dan ubah type nya menjadi "cancellation"
+    // 2. Transition
+
+    console.log(scheduleChanges)
+
+    scheduleChanges.forEach((change) => {
+        // handle cancellation and transition-before
+        const scheduledDay = new Date(change.scheduled_date).getDay()
+        const idx = schedule[scheduledDay].findIndex((sch) => {
+            return sch.id === change.schedule_id && sch.date === change.scheduled_date
+        })
+        let type = change.type === "transition" ? "transition-before" : change.type
+        schedule[scheduledDay][idx] = {
+            ...schedule[scheduledDay][idx],
+            type,
+        }
+
+        if (change.type === "cancellation") return
+
+        // handle transition-after
+        const transitionedDay = new Date(change.transitioned_date).getDay()
+        const transitionedDate = daysOfWeekFormatted[transitionedDay]
+        const initialDay = new Date(change.scheduled_date).getDay()
+        const original = schedule[initialDay].find((sch) => sch.id === change.schedule_id)!
+        if (transitionedDate === change.transitioned_date)
+            schedule[transitionedDay].push({
+                ...original,
+                ...change,
+                type: "transition-after",
+            })
+    })
+
+    // sort by start_time
+    schedule = schedule.map((todaySchedule) => {
+        return todaySchedule.sort((a, b) => {
+            return a.start_time > b.start_time ? 1 : -1
+        })
+    })
+
+    return schedule
+}
 
 export class Schedule {
     id?: number
@@ -54,25 +133,53 @@ export class Schedule {
     }
 
     static getAll() {
-        return db.query<Schedule, null>("SELECT * FROM schedule ORDER BY start_time").all(null)
+        return db.query<ScheduleInterface, null>("SELECT * FROM schedule ORDER BY start_time").all(null)
     }
 
-    /*
-       Group by day. 
-    */
-    static getGroupedByDay() {
-        let schedule = this.getAll()
+    static getThisWeek() {
+        const startOfWeek = startOfISOWeek(new Date())
 
-        const groupedSchedule: Schedule[][] = [[], [], [], [], [], [], []]
-        schedule.forEach((item) => {
-            if (groupedSchedule[item.day]) {
-                groupedSchedule[item.day].push(item)
-            } else {
-                groupedSchedule[item.day] = [item]
-            }
+        const daysOfWeek = eachDayOfInterval({
+            start: startOfWeek,
+            end: add(startOfWeek, { days: 6 }),
         })
 
-        return groupedSchedule
+        let daysOfWeekFormatted: string[] = []
+        daysOfWeek.forEach((day) => {
+            // format it to YYYY-MM-DD that database understands
+            const newFormat = format(day, "y-MM-dd")
+            daysOfWeekFormatted.push(newFormat)
+        })
+
+        // put sunday at the front
+        const sunday = daysOfWeekFormatted.pop()
+        daysOfWeekFormatted.unshift(sunday!)
+
+        let schedule = groupByDay(this.getAll())
+        schedule = schedule.map((todaySchedule, day) => {
+            return todaySchedule.map((entry) => {
+                entry.date = daysOfWeekFormatted[day]
+
+                return entry
+            })
+        })
+
+        const query = db.query<ScheduleChangeInterface, GetThisWeekParams>(`
+        SELECT * FROM schedule_changes
+        WHERE 
+            CASE 
+            WHEN type = 'transition' THEN scheduled_date BETWEEN $start_of_week AND $end_of_week OR transitioned_date BETWEEN $start_of_week AND $end_of_week
+            WHEN type = 'cancellation' THEN scheduled_date BETWEEN $start_of_week AND $end_of_week
+          END
+        `)
+        const scheduleChanges = query.all({
+            $start_of_week: daysOfWeekFormatted[1],
+            $end_of_week: daysOfWeekFormatted[0],
+        })
+
+        schedule = applyScheduleChanges(schedule, scheduleChanges, daysOfWeekFormatted)
+
+        return schedule
     }
 
     static getFirst({
@@ -83,9 +190,9 @@ export class Schedule {
         start_time: start_time,
         end_time: end_time,
         day,
-    }: Partial<Schedule>) {
+    }: Partial<ScheduleInterface>) {
         return db
-            .query<Schedule, Partial<ScheduleEntryParams>>(
+            .query<ScheduleInterface, Partial<ScheduleEntryParams>>(
                 `SELECT * FROM schedule
                  WHERE id = $id OR
                  course = $course OR
@@ -114,9 +221,9 @@ export class Schedule {
         start_time: start_time,
         end_time: end_time,
         day,
-    }: Partial<Schedule>) {
+    }: Partial<ScheduleInterface>) {
         return db
-            .query<Schedule, GetScheduleEntryParams>(
+            .query<ScheduleInterface, GetScheduleEntryParams>(
                 `SELECT * FROM schedule
                  WHERE id = $id OR
                  course = $course OR

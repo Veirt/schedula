@@ -2,8 +2,7 @@
     import { days } from "$lib/utils/day"
 
     export let currentDay: number
-
-    let displayWeekend = false
+    export let displayWeekend: boolean
 </script>
 
 <div class="flex flex-wrap justify-center mt-5 md:flex-row">
@@ -17,10 +16,6 @@
             {day.name}
         </button>
     {/each}
-</div>
-<div class="my-3">
-    <input id="display-weekend" bind:checked={displayWeekend} type="checkbox" />
-    <label class="select-none" for="display-weekend">Display Weekend?</label>
 </div>
 
 <style lang="postcss">

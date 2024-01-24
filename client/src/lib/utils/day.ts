@@ -7,3 +7,5 @@ export const days = [
     { name: "Saturday", index: 6 },
     { name: "Sunday", index: 0 },
 ]
+
+export const dayArray = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]

@@ -4,6 +4,7 @@
     import axios from "$lib/axios"
 
     export let showCreateModal: boolean
+    export let showScheduleChangeModal: boolean
 
     let showDropdownMenu = false
 
@@ -35,6 +36,8 @@
     <div class="flex flex-row items-center">
         {#if $isLoggedIn === true}
             <button class="py-2 px-5 rounded bg-alt" on:click={() => (showCreateModal = true)}>Create</button>
+            <button class="py-2 px-5 rounded bg-alt" on:click={() => (showScheduleChangeModal = true)}
+                >Create Schedule Change</button>
 
             <div class="ml-3" on:focusout={handleDropdownFocusLoss}>
                 <!-- svelte-ignore a11y-missing-attribute -->

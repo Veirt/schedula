@@ -2,12 +2,13 @@
     import ConfirmModal from "$lib/components/ConfirmModal.svelte"
     import { createEventDispatcher } from "svelte"
     import { isLoggedIn } from "$lib/store/auth"
+    import { schedule } from "$lib/store/schedule"
     import axios from "$lib/axios"
 
     export let currentDay: number
     export let showUpdateModal: boolean
     export let currScheduleEntry: ScheduleEntry
-    export let schedule: ScheduleEntry[][]
+    export let displayAllEntry: boolean
 
     let showConfirmModal = false
     let scheduleId: number | undefined
@@ -49,11 +50,18 @@
             </tr>
         </thead>
         <tbody>
-            {#each schedule[currentDay] as scheduleEntry (scheduleEntry.id)}
+            {#each $schedule[currentDay] as scheduleEntry}
                 {@const lecturers = scheduleEntry.lecturer.split("/")}
-                <tr>
-                    <td class="p-3 text-center border b-secondary"
-                        >{scheduleEntry.start_time} - {scheduleEntry.end_time}</td>
+                <tr
+                    class:hidden={(scheduleEntry.type === "cancellation" ||
+                        scheduleEntry.type === "transition-before") &&
+                        !displayAllEntry}
+                    class:cancelled-row={scheduleEntry.type === "cancellation"}
+                    class:transition-before-row={scheduleEntry.type === "transition-before"}
+                    class:transition-after-row={scheduleEntry.type === "transition-after"}>
+                    <td class="p-3 text-center border b-secondary">
+                        {scheduleEntry.start_time} - {scheduleEntry.end_time}
+                    </td>
                     <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
                     <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
                     <td class="p-3 border text-[12px] b-secondary">
@@ -90,3 +98,17 @@
 </div>
 
 <ConfirmModal bind:showConfirmModal on:deleteConfirmed={handleDelete} />
+
+<style lang="postcss">
+    .transition-before-row {
+        @apply bg-yellow-300/7;
+    }
+
+    .transition-after-row {
+        @apply bg-green-300/7;
+    }
+
+    .cancelled-row {
+        @apply bg-red-500/20;
+    }
+</style>

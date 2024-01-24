@@ -2,13 +2,16 @@ import { Hono } from "hono"
 import { jwt } from "hono/jwt"
 import { JWT_SECRET } from "../config/env"
 import {
+    createScheduleChanges,
     createScheduleEntry,
     deleteScheduleEntryById,
     getScheduleEntryByDay,
     getScheduleEntryById,
-    getScheduleGroupedByDay,
+    getScheduleThisWeek,
     updateScheduleEntryById,
 } from "../controllers/schedule"
+import { zValidator } from "@hono/zod-validator"
+import { scheduleChangeSchema } from "../models/ScheduleChanges"
 
 // /api/schedule
 const scheduleRouter = new Hono()
@@ -24,8 +27,10 @@ scheduleRouter.use("/*", (c, next) => {
     return jwtMiddleware(c, next)
 })
 
-scheduleRouter.get("/", getScheduleGroupedByDay)
+scheduleRouter.get("/", getScheduleThisWeek)
 scheduleRouter.post("/", createScheduleEntry)
+
+scheduleRouter.post("/changes", zValidator("json", scheduleChangeSchema), createScheduleChanges)
 
 scheduleRouter.get("/:id", getScheduleEntryById)
 scheduleRouter.patch("/:id", updateScheduleEntryById)

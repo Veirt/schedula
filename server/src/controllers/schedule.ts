@@ -1,8 +1,10 @@
-import { Context } from "hono"
+import { Context, Env } from "hono"
+import z from "zod"
 import { Schedule } from "../models/Schedule"
+import { ScheduleChange, scheduleChangeSchema } from "../models/ScheduleChanges"
 
-export const getScheduleGroupedByDay = (c: Context) => {
-    return c.json({ data: Schedule.getGroupedByDay() })
+export const getScheduleThisWeek = (c: Context) => {
+    return c.json({ data: Schedule.getThisWeek() })
 }
 
 export const createScheduleEntry = async (c: Context) => {
@@ -44,6 +46,20 @@ export const createScheduleEntry = async (c: Context) => {
     newSchedule.insert()
 
     return c.json(null, 201)
+}
+
+export const createScheduleChanges = (
+    c: Context<Env, "/changes", { out: { json: z.infer<typeof scheduleChangeSchema> } }>,
+) => {
+    const data = c.req.valid("json")
+
+    const newScheduleChange = new ScheduleChange({
+        ...data,
+    })
+
+    newScheduleChange.insert()
+
+    return c.json({}, 201)
 }
 
 export const getScheduleEntryById = (c: Context) => {

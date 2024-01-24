@@ -3,7 +3,7 @@ import { cors } from "hono/cors"
 import { CLIENT_URL, checkRequiredVariables } from "./config/env"
 import { Account } from "./models/Account"
 import { Schedule } from "./models/Schedule"
-import { ScheduleChanges } from "./models/ScheduleChanges"
+import { ScheduleChange } from "./models/ScheduleChanges"
 import authRouter from "./routes/auth"
 import oauthRouter from "./routes/oauth"
 import scheduleRouter from "./routes/schedule"
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 Schedule.init()
-ScheduleChanges.init()
+ScheduleChange.init()
 Account.init()
 
 app.route("/api/schedule", scheduleRouter)

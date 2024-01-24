@@ -15,7 +15,8 @@ export const discordCallback = async (c: Context) => {
 
     let authData: { access_token: string; refresh_token: string }
     try {
-        authData = await getTokens(code!)
+        if (!code) throw Error("code is empty")
+        authData = await getTokens(code)
     } catch (err) {
         console.error(`[discordCallback]: ${err}`)
         return c.json({ error: "invalid code" }, 400)
