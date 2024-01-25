@@ -5,6 +5,7 @@ import { JWT_SECRET } from "../config/env"
 import {
     createScheduleChange,
     createScheduleEntry,
+    deleteScheduleChangeById,
     deleteScheduleEntryById,
     getScheduleChange,
     getScheduleChangeById,
@@ -41,6 +42,11 @@ scheduleRouter.patch(
     zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
     zValidator("json", scheduleChangeSchema),
     updateScheduleChangeById,
+)
+scheduleRouter.delete(
+    "/changes/:id",
+    zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
+    deleteScheduleChangeById,
 )
 scheduleRouter.post("/changes", zValidator("json", scheduleChangeSchema), createScheduleChange)
 

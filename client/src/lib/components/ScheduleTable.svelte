@@ -12,7 +12,8 @@
     export let currScheduleChange: Partial<ScheduleChange>
     export let displayAllEntry: boolean
 
-    let showConfirmModal = false
+    let showDelScheduleConfirm = false
+    let showDelScheduleChangeConfirm = false
     let scheduleId: number | undefined
     let scheduleChangeId: number | undefined
 
@@ -25,20 +26,30 @@
         showUpdateModal = true
     }
 
-    async function handleEditScheduleChange() {
-        const res = await axios.get(`/api/schedule/changes/${scheduleChangeId}`)
-        currScheduleChange = res.data.data
-        showScheduleChangeModal = { open: true, form: "update" }
-    }
-
-    async function handleDelete() {
+    async function handleDeleteSchedule() {
         const res = await axios.delete(`/api/schedule/${scheduleId}`)
 
         if (res.status === 204) {
             dispatch("fetchSchedule")
         }
 
-        showConfirmModal = false
+        showDelScheduleConfirm = false
+    }
+
+    async function handleEditScheduleChange() {
+        const res = await axios.get(`/api/schedule/changes/${scheduleChangeId}`)
+        currScheduleChange = res.data.data
+        showScheduleChangeModal = { open: true, form: "update" }
+    }
+
+    async function handleDeleteScheduleChange() {
+        const res = await axios.delete(`/api/schedule/changes/${scheduleChangeId}`)
+
+        if (res.status === 204) {
+            dispatch("fetchSchedule")
+        }
+
+        showDelScheduleChangeConfirm = false
     }
 </script>
 
@@ -97,8 +108,13 @@
                                     data-schedule-id={scheduleEntry.id}>Edit</button>
                                 <button
                                     on:click={() => {
-                                        scheduleId = scheduleEntry.id
-                                        showConfirmModal = true
+                                        if (!scheduleEntry.change?.type) {
+                                            scheduleId = scheduleEntry.id
+                                            showDelScheduleConfirm = true
+                                        } else {
+                                            scheduleChangeId = scheduleEntry.change.sch_change_id
+                                            showDelScheduleChangeConfirm = true
+                                        }
                                     }}
                                     class="py-2 px-3 rounded bg-alt">Delete</button>
                             </div>
@@ -110,7 +126,13 @@
     </table>
 </div>
 
-<ConfirmModal bind:showConfirmModal on:deleteConfirmed={handleDelete} />
+<ConfirmModal bind:showConfirmModal={showDelScheduleConfirm} on:deleteConfirmed={handleDeleteSchedule}>
+    Are you sure you want to delete this entry?
+</ConfirmModal>
+
+<ConfirmModal bind:showConfirmModal={showDelScheduleChangeConfirm} on:deleteConfirmed={handleDeleteScheduleChange}>
+    Are you sure you want to delete this schedule change?
+</ConfirmModal>
 
 <style lang="postcss">
     .transition-before-row {

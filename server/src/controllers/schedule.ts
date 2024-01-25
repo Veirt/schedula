@@ -91,6 +91,13 @@ export const updateScheduleChangeById = (
     return c.json({}, 204)
 }
 
+export const deleteScheduleChangeById = (c: Context) => {
+    const id = c.req.param("id")
+
+    ScheduleChange.deleteById(parseInt(id))
+    return c.json({}, 204)
+}
+
 export const getScheduleEntryById = (c: Context) => {
     const id = parseInt(c.req.param("id"))
 

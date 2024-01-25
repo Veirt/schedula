@@ -96,6 +96,10 @@ export class ScheduleChange implements ScheduleChangeInterface {
             .get(id)
     }
 
+    static deleteById(id: number) {
+        db.run("DELETE FROM schedule_changes WHERE sch_change_id = ?", [id])
+    }
+
     insert() {
         db.query<null, InsertScheduleChangeParams>(
             "INSERT INTO schedule_changes VALUES (null, $schedule_id, $classroom, $start_time, $end_time, $type, $scheduled_date, $transitioned_date)",
