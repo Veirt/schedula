@@ -7,22 +7,28 @@
 
     export let currentDay: number
     export let showUpdateModal: boolean
+    export let showScheduleChangeModal: { open: boolean; form: string }
     export let currScheduleEntry: ScheduleEntry
+    export let currScheduleChange: Partial<ScheduleChange>
     export let displayAllEntry: boolean
 
     let showConfirmModal = false
     let scheduleId: number | undefined
+    let scheduleChangeId: number | undefined
 
     const dispatch = createEventDispatcher()
 
-    async function handleEdit(e: MouseEvent) {
-        const target = e.target as HTMLButtonElement
-        const scheduleId = parseInt(target.dataset.scheduleId!)
-
+    async function handleEditSchedule() {
         const res = await axios.get(`/api/schedule/${scheduleId}`)
 
         currScheduleEntry = res.data.data.entry
         showUpdateModal = true
+    }
+
+    async function handleEditScheduleChange() {
+        const res = await axios.get(`/api/schedule/changes/${scheduleChangeId}`)
+        currScheduleChange = res.data.data
+        showScheduleChangeModal = { open: true, form: "update" }
     }
 
     async function handleDelete() {
@@ -40,10 +46,10 @@
     <table class="mt-5 border table-fixed b-secondary">
         <thead>
             <tr>
-                <td class="p-3 border b-secondary min-w-35">Time</td>
-                <td class="p-3 border b-secondary min-w-25">Classroom</td>
-                <td class="p-3 border b-secondary min-w-50 w-50">Course</td>
-                <td class="p-3 border b-secondary min-w-50">Lecturer(s)</td>
+                <td class="p-3 border b-secondary w-35">Time</td>
+                <td class="p-3 border b-secondary w-35">Classroom</td>
+                <td class="p-3 w-80 border b-secondary">Course</td>
+                <td class="p-3 border w-70 b-secondary">Lecturer(s)</td>
                 {#if $isLoggedIn}
                     <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
                 {/if}
@@ -56,10 +62,11 @@
                     class:hidden={(scheduleEntry.type === "cancellation" ||
                         scheduleEntry.type === "transition-before") &&
                         !displayAllEntry}
-                    class:cancelled-row={scheduleEntry.type === "cancellation"}
-                    class:transition-before-row={scheduleEntry.type === "transition-before"}
-                    class:transition-after-row={scheduleEntry.type === "transition-after"}>
+                    class:cancelled-row={scheduleEntry.change?.type === "cancellation"}
+                    class:transition-before-row={scheduleEntry.change?.type === "transition-before"}
+                    class:transition-after-row={scheduleEntry.change?.type === "transition-after"}>
                     <td class="p-3 text-center border b-secondary">
+                        <span> {scheduleEntry.date}<br /></span>
                         {scheduleEntry.start_time} - {scheduleEntry.end_time}
                     </td>
                     <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
@@ -76,9 +83,15 @@
                         <td class="p-3 border b-secondary">
                             <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
                                 <button
-                                    on:click={(e) => {
-                                        scheduleId = scheduleEntry.id
-                                        handleEdit(e)
+                                    on:click={() => {
+                                        // if it is not a schedule change
+                                        if (!scheduleEntry.change?.type) {
+                                            scheduleId = scheduleEntry.id
+                                            handleEditSchedule()
+                                        } else {
+                                            scheduleChangeId = scheduleEntry.change.sch_change_id
+                                            handleEditScheduleChange()
+                                        }
                                     }}
                                     class="py-2 px-5 rounded bg-alt"
                                     data-schedule-id={scheduleEntry.id}>Edit</button>

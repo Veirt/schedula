@@ -6,16 +6,18 @@ type ScheduleEntry = {
     start_time: string
     end_time: string
     date?: string
-    type?: string
     day: number
+    change?: ScheduleChange
 }
 
-type ScheduleChanges = {
+type ScheduleChange = {
+    sch_change_id: number
     schedule_id: number
     classroom: string
     start_time: string
     end_time: string
     type: string
+    date?: string
     scheduled_date: string
     transitioned_date: string
 }

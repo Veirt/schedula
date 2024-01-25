@@ -1,3 +1,5 @@
 import { writable } from "svelte/store"
 
-export const schedule = writable<ScheduleEntry[][]>([[]])
+type Schedule = ScheduleEntry & Partial<ScheduleChange>
+
+export const schedule = writable<Schedule[][]>([[]])

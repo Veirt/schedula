@@ -1,17 +1,21 @@
+import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { jwt } from "hono/jwt"
 import { JWT_SECRET } from "../config/env"
 import {
-    createScheduleChanges,
+    createScheduleChange,
     createScheduleEntry,
     deleteScheduleEntryById,
+    getScheduleChange,
+    getScheduleChangeById,
     getScheduleEntryByDay,
     getScheduleEntryById,
     getScheduleThisWeek,
+    updateScheduleChangeById,
     updateScheduleEntryById,
 } from "../controllers/schedule"
-import { zValidator } from "@hono/zod-validator"
 import { scheduleChangeSchema } from "../models/ScheduleChanges"
+import { z } from "zod"
 
 // /api/schedule
 const scheduleRouter = new Hono()
@@ -30,7 +34,15 @@ scheduleRouter.use("/*", (c, next) => {
 scheduleRouter.get("/", getScheduleThisWeek)
 scheduleRouter.post("/", createScheduleEntry)
 
-scheduleRouter.post("/changes", zValidator("json", scheduleChangeSchema), createScheduleChanges)
+scheduleRouter.get("/changes", getScheduleChange)
+scheduleRouter.get("/changes/:id", getScheduleChangeById)
+scheduleRouter.patch(
+    "/changes/:id",
+    zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
+    zValidator("json", scheduleChangeSchema),
+    updateScheduleChangeById,
+)
+scheduleRouter.post("/changes", zValidator("json", scheduleChangeSchema), createScheduleChange)
 
 scheduleRouter.get("/:id", getScheduleEntryById)
 scheduleRouter.patch("/:id", updateScheduleEntryById)

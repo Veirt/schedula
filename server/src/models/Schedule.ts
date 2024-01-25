@@ -1,4 +1,4 @@
-import { add, eachDayOfInterval, format, startOfISOWeek } from "date-fns"
+import { add, eachDayOfInterval, format, nextMonday, startOfISOWeek } from "date-fns"
 import db from "../db"
 import { ScheduleChangeInterface } from "./ScheduleChanges"
 
@@ -12,6 +12,7 @@ interface ScheduleInterface {
     date?: string
     type?: string
     day: number
+    change?: ScheduleChangeInterface
 }
 
 type ScheduleEntryParams = {
@@ -52,9 +53,6 @@ function applyScheduleChanges(
     // Tipe Perubahan jadwal:
     // 1. Cancellation: Misalnya ada jadwal yang dibatalkan. Maka ambil scheduled_date nya, dan ubah type nya menjadi "cancellation"
     // 2. Transition
-
-    console.log(scheduleChanges)
-
     scheduleChanges.forEach((change) => {
         // handle cancellation and transition-before
         const scheduledDay = new Date(change.scheduled_date).getDay()
@@ -64,7 +62,10 @@ function applyScheduleChanges(
         let type = change.type === "transition" ? "transition-before" : change.type
         schedule[scheduledDay][idx] = {
             ...schedule[scheduledDay][idx],
-            type,
+            change: {
+                ...change,
+                type,
+            },
         }
 
         if (change.type === "cancellation") return
@@ -77,8 +78,10 @@ function applyScheduleChanges(
         if (transitionedDate === change.transitioned_date)
             schedule[transitionedDay].push({
                 ...original,
-                ...change,
-                type: "transition-after",
+                change: {
+                    ...change,
+                    type: "transition-after",
+                },
             })
     })
 

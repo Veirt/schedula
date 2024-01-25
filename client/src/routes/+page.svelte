@@ -15,7 +15,11 @@
 
     let showCreateModal = false
     let showUpdateModal = false
-    let showScheduleChangeModal = false
+    let showScheduleChangeModal = {
+        open: false,
+        form: "",
+    }
+
     let currScheduleEntry: ScheduleEntry = {
         classroom: "",
         course: "",
@@ -23,6 +27,15 @@
         start_time: "",
         end_time: "",
         day: 0,
+    }
+    let currScheduleChange: Partial<ScheduleChange> = {
+        schedule_id: undefined,
+        classroom: "",
+        start_time: "",
+        end_time: "",
+        type: undefined,
+        scheduled_date: undefined,
+        transitioned_date: "",
     }
 
     let displayWeekend = false
@@ -47,7 +60,7 @@
 
 <UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
 <CreateFormModal on:fetchSchedule={fetchSchedule} bind:showCreateModal bind:currentDay />
-<ScheduleChangeFormModal on:fetchSchedule={fetchSchedule} bind:showScheduleChangeModal />
+<ScheduleChangeFormModal on:fetchSchedule={fetchSchedule} bind:showScheduleChangeModal bind:currScheduleChange />
 
 <main class="flex flex-col justify-center items-center mt-15">
     <h1 class="text-3xl">Schedule</h1>
@@ -71,7 +84,9 @@
             on:fetchSchedule={fetchSchedule}
             bind:displayAllEntry
             bind:currScheduleEntry
+            bind:currScheduleChange
             bind:showUpdateModal
+            bind:showScheduleChangeModal
             {currentDay} />
     {/if}
 </main>

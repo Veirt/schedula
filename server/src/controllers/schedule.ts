@@ -48,18 +48,47 @@ export const createScheduleEntry = async (c: Context) => {
     return c.json(null, 201)
 }
 
-export const createScheduleChanges = (
+export const getScheduleChange = (c: Context) => {
+    // TODO: handle validation better than only parseInt
+    const scheduleId = c.req.query("schedule_id")
+    if (scheduleId) {
+        const scheduleChanges = ScheduleChange.getAll(parseInt(scheduleId))
+        return c.json({ data: scheduleChanges })
+    }
+    const scheduleChanges = ScheduleChange.getAll()
+
+    return c.json({ data: scheduleChanges })
+}
+
+export const getScheduleChangeById = (c: Context) => {
+    const scheduleChangeId = parseInt(c.req.param("id"))
+
+    const scheduleChange = ScheduleChange.getById(scheduleChangeId)
+
+    return c.json({ data: scheduleChange })
+}
+
+export const createScheduleChange = (
     c: Context<Env, "/changes", { out: { json: z.infer<typeof scheduleChangeSchema> } }>,
 ) => {
     const data = c.req.valid("json")
 
-    const newScheduleChange = new ScheduleChange({
-        ...data,
-    })
-
+    const newScheduleChange = new ScheduleChange(data)
     newScheduleChange.insert()
 
     return c.json({}, 201)
+}
+
+export const updateScheduleChangeById = (
+    c: Context<Env, "/changes/:id", { out: { json: z.infer<typeof scheduleChangeSchema> } }>,
+) => {
+    const id = c.req.param("id")
+    const data = c.req.valid("json")
+
+    const scheduleChange = new ScheduleChange({ sch_change_id: parseInt(id), ...data })
+    scheduleChange.update()
+
+    return c.json({}, 204)
 }
 
 export const getScheduleEntryById = (c: Context) => {
