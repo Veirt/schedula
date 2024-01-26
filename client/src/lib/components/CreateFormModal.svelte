@@ -22,11 +22,7 @@
     $: newScheduleEntry.day = currentDay
 
     async function createScheduleEntry() {
-        const res = await axios.post("/api/schedule", newScheduleEntry, {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        })
+        const res = await axios.post("/api/schedule", newScheduleEntry)
 
         // success
         if (res.status === 201) {

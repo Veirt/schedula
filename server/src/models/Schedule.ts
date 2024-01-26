@@ -1,6 +1,7 @@
 import { add, eachDayOfInterval, format, nextMonday, startOfISOWeek } from "date-fns"
 import db from "../db"
 import { ScheduleChangeInterface } from "./ScheduleChanges"
+import { z } from "zod"
 
 interface ScheduleInterface {
     id?: number
@@ -14,6 +15,17 @@ interface ScheduleInterface {
     day: number
     change?: ScheduleChangeInterface
 }
+
+const timeRegex = new RegExp(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+export const scheduleSchema = z.object({
+    id: z.number().optional(),
+    course: z.string(),
+    classroom: z.string(),
+    lecturer: z.string(),
+    start_time: z.string().regex(timeRegex, { message: "Start time is not valid" }),
+    end_time: z.string().regex(timeRegex, { message: "End time is not valid" }),
+    day: z.number().min(0).max(6),
+})
 
 type ScheduleEntryParams = {
     $id: number
