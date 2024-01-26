@@ -1,7 +1,7 @@
 import { Context, Env } from "hono"
 import z from "zod"
-import { Schedule, scheduleSchema } from "../models/Schedule"
-import { ScheduleChange, scheduleChangeSchema } from "../models/ScheduleChanges"
+import { Schedule, scheduleSchema } from "../models/Schedule.model"
+import { ScheduleChange, scheduleChangeSchema } from "../models/ScheduleChange.model"
 
 export const getScheduleThisWeek = (c: Context) => {
     return c.json({ data: Schedule.getThisWeek() })
@@ -55,14 +55,14 @@ export const updateScheduleChangeById = (
     const scheduleChange = new ScheduleChange({ sch_change_id: parseInt(id), ...data })
     scheduleChange.update()
 
-    return c.json({}, 204)
+    return c.json({ success: true }, 200)
 }
 
 export const deleteScheduleChangeById = (c: Context) => {
     const id = c.req.param("id")
 
     ScheduleChange.deleteById(parseInt(id))
-    return c.json({}, 204)
+    return c.json({ success: true }, 200)
 }
 
 export const getScheduleEntryById = (c: Context) => {
@@ -96,7 +96,7 @@ export const updateScheduleEntryById = async (
     const schedule = new Schedule(entry)
     schedule.update()
 
-    return c.json({}, 204)
+    return c.json({ success: true }, 200)
 }
 
 export const deleteScheduleEntryById = (c: Context) => {
@@ -110,7 +110,7 @@ export const deleteScheduleEntryById = (c: Context) => {
     const schedule = new Schedule({ ...entry })
     schedule.delete()
 
-    return c.json({}, 204)
+    return c.json({ success: true }, 200)
 }
 
 export const getScheduleEntryByDay = (c: Context) => {

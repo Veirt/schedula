@@ -11,8 +11,6 @@ COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 COPY . .
 
-ARG PUBLIC_SERVER_URL
-ENV PUBLIC_SERVER_URL $PUBLIC_SERVER_URL
 RUN bun run build
 
 # setup nginx

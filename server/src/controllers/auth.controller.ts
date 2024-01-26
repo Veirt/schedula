@@ -1,6 +1,6 @@
 import { Context } from "hono"
 import { setCookie } from "hono/cookie"
-import { Account } from "../models/Account"
+import { Account } from "../models/Account.model"
 
 export const getMyAccount = (c: Context) => {
     const payload = c.get("jwtPayload")
@@ -16,5 +16,5 @@ export const getMyAccount = (c: Context) => {
 export const logOut = (c: Context) => {
     setCookie(c, "jwt", "", { maxAge: 0 })
 
-    return c.json({}, 204)
+    return c.json({ sucess: true }, 200)
 }

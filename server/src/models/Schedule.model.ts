@@ -1,7 +1,7 @@
-import { add, eachDayOfInterval, format, nextMonday, startOfISOWeek } from "date-fns"
-import db from "../db"
-import { ScheduleChangeInterface } from "./ScheduleChanges"
+import { add, eachDayOfInterval, format, startOfISOWeek } from "date-fns"
 import { z } from "zod"
+import db from "../db"
+import { ScheduleChangeInterface } from "./ScheduleChange.model"
 
 interface ScheduleInterface {
     id?: number

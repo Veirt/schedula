@@ -8,7 +8,7 @@ import {
     DISCORD_SERVER_ID,
     JWT_SECRET,
 } from "../config/env"
-import { Account } from "../models/Account"
+import { Account } from "../models/Account.model"
 
 export const discordCallback = async (c: Context) => {
     const code = c.req.query("code")
@@ -45,7 +45,7 @@ export const discordCallback = async (c: Context) => {
 
     const token = await sign({ id: account.id, name: account.name }, JWT_SECRET)
     setCookie(c, "jwt", token)
-    return c.redirect(Bun.env.CLIENT_URL!)
+    return c.redirect("/")
 }
 
 export const redirectToDiscordOAuth = (c: Context) => {

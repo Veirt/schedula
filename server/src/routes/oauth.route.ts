@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { discordCallback, redirectToDiscordOAuth } from "../controllers/oauth"
+import { discordCallback, redirectToDiscordOAuth } from "../controllers/oauth.controller"
 
 // /oauth
 const oauthRouter = new Hono()

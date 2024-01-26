@@ -29,7 +29,7 @@
     async function handleDeleteSchedule() {
         const res = await axios.delete(`/api/schedule/${scheduleId}`)
 
-        if (res.status === 204) {
+        if (res.status === 200) {
             dispatch("fetchSchedule")
         }
 
@@ -45,7 +45,7 @@
     async function handleDeleteScheduleChange() {
         const res = await axios.delete(`/api/schedule/changes/${scheduleChangeId}`)
 
-        if (res.status === 204) {
+        if (res.status === 200) {
             dispatch("fetchSchedule")
         }
 

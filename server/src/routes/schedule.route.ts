@@ -15,9 +15,9 @@ import {
     getScheduleThisWeek,
     updateScheduleChangeById,
     updateScheduleEntryById,
-} from "../controllers/schedule"
-import { scheduleChangeSchema } from "../models/ScheduleChanges"
-import { scheduleSchema } from "../models/Schedule"
+} from "../controllers/schedule.controller"
+import { scheduleSchema } from "../models/Schedule.model"
+import { scheduleChangeSchema } from "../models/ScheduleChange.model"
 
 // /api/schedule
 const scheduleRouter = new Hono()

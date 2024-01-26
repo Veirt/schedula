@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { jwt } from "hono/jwt"
 import { JWT_SECRET } from "../config/env"
-import { getMyAccount, logOut } from "../controllers/auth"
+import { getMyAccount, logOut } from "../controllers/auth.controller"
 
 // /api/auth
 const authRouter = new Hono()

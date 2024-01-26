@@ -118,7 +118,7 @@
                 currScheduleChange,
             )
 
-            if (res.status === 204) {
+            if (res.status === 200) {
                 showScheduleChangeModal = { open: false, form: "" }
                 dispatch("fetchSchedule")
             }

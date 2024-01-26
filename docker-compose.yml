@@ -9,7 +9,6 @@ services:
       - DISCORD_SERVER_ID=
       - DISCORD_OAUTH_REDIRECT_URI=
       - JWT_SECRET=
-      - CLIENT_URL=
     volumes:
       - ./server/db.sqlite:/usr/src/app/db.sqlite
     build:
@@ -20,8 +19,6 @@ services:
       - 8490:80
     build:
       context: client
-      args:
-        - PUBLIC_SERVER_URL=
     depends_on:
       - server
   notifier:

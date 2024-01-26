@@ -11,17 +11,9 @@
 
     async function updateScheduleEntry() {
         const { id, course, day, start_time, end_time, classroom, lecturer } = currScheduleEntry
-        const res = await axios.patch(
-            `/api/schedule/${id}`,
-            { course, day, start_time, end_time, classroom, lecturer },
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            },
-        )
+        const res = await axios.patch(`/api/schedule/${id}`, { course, day, start_time, end_time, classroom, lecturer })
 
-        if (res.status === 204) {
+        if (res.status === 200) {
             showUpdateModal = false
             dispatch("fetchSchedule")
         }

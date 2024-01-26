@@ -1,6 +1,5 @@
 <script lang="ts">
     import { account, isLoggedIn } from "$lib/store/auth"
-    import { PUBLIC_SERVER_URL } from "$env/static/public"
     import axios from "$lib/axios"
 
     export let showCreateModal: boolean
@@ -60,7 +59,7 @@
             </div>
         {:else}
             <button class:invisible={$isLoggedIn == null} class="py-2 px-5 rounded bg-alt">
-                <a href={`${PUBLIC_SERVER_URL ? PUBLIC_SERVER_URL : ""}/api/oauth/discord`}>Login</a>
+                <a href="/api/oauth/discord">Login</a>
             </button>
         {/if}
     </div>
