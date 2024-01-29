@@ -5,13 +5,20 @@
     import { createEventDispatcher } from "svelte"
 
     export let showUpdateModal: boolean
-    export let currScheduleEntry: ScheduleEntry
+    export let currScheduleEntry: CurrScheduleEntry
 
     const dispatch = createEventDispatcher()
 
     async function updateScheduleEntry() {
-        const { id, course, day, start_time, end_time, classroom, lecturer } = currScheduleEntry
-        const res = await axios.patch(`/api/schedule/${id}`, { course, day, start_time, end_time, classroom, lecturer })
+        const { id, course, day, startTime, endTime, classroom, lecturer } = currScheduleEntry
+        const res = await axios.patch(`/api/schedule/${id}`, {
+            course,
+            day,
+            startTime,
+            endTime,
+            classroom,
+            lecturer,
+        })
 
         if (res.status === 200) {
             showUpdateModal = false
@@ -36,14 +43,14 @@
                 <label for="time-start">Start</label>
                 <input
                     required
-                    bind:value={currScheduleEntry.start_time}
+                    bind:value={currScheduleEntry.startTime}
                     id="time-start"
                     class="p-2 bg-alt"
                     type="text" />
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>
-                <input required bind:value={currScheduleEntry.end_time} id="time-end" class="p-2 bg-alt" type="text" />
+                <input required bind:value={currScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
             </div>
         </div>
 

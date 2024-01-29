@@ -1,23 +1,52 @@
-type ScheduleEntry = {
+type Schedule = {
+    id: number
+    course: string
+    classroom: string
+    lecturer: string
+    startTime: string
+    endTime: string
+    day: number
+}
+
+type CurrScheduleEntry = {
     id?: number
     course: string
     classroom: string
     lecturer: string
-    start_time: string
-    end_time: string
-    date?: string
+    startTime: string
+    endTime: string
     day: number
-    change?: ScheduleChange
+}
+
+type ScheduleThisWeek = Schedule & {
+    transitionedDay: number | null
+    scheduleChangeId: number | null
+    type: string | null
+    scheduledDate: string | null
+    transitionedDate: string | null
+    date: string
 }
 
 type ScheduleChange = {
-    sch_change_id: number
-    schedule_id: number
+    id: number
+    scheduleId: number
     classroom: string
-    start_time: string
-    end_time: string
+    startTime: string
+    endTime: string
     type: string
-    date?: string
-    scheduled_date: string
-    transitioned_date: string
+    scheduledDate: string
+    transitionedDate: string
 }
+
+type CurrScheduleChange = {
+    id: number
+    scheduleId: number | null
+    classroom: string
+    startTime: string
+    endTime: string
+    type: string | null
+    scheduledDate: string | null
+    transitionedDate: string
+    date?: string
+}
+type NewScheduleChange = Omit<ScheduleChange, "id">

@@ -1,3 +1,5 @@
+import "dotenv/config"
+
 export function checkRequiredVariables() {
     const requiredVariables = [
         "DISCORD_OAUTH_CLIENT_ID",
@@ -7,14 +9,14 @@ export function checkRequiredVariables() {
         "JWT_SECRET",
     ]
     for (const variable of requiredVariables) {
-        if (!Bun.env[variable]) {
+        if (!process.env[variable]) {
             throw Error(`Error: Environment variable ${variable} is not set.`)
         }
     }
 }
 
-export const DISCORD_OAUTH_CLIENT_ID = Bun.env.DISCORD_OAUTH_CLIENT_ID!
-export const DISCORD_OAUTH_CLIENT_SECRET = Bun.env.DISCORD_OAUTH_CLIENT_SECRET!
-export const DISCORD_OAUTH_REDIRECT_URI = Bun.env.DISCORD_OAUTH_REDIRECT_URI!
-export const DISCORD_SERVER_ID = Bun.env.DISCORD_SERVER_ID!
-export const JWT_SECRET = Bun.env.JWT_SECRET!
+export const DISCORD_OAUTH_CLIENT_ID = process.env.DISCORD_OAUTH_CLIENT_ID!
+export const DISCORD_OAUTH_CLIENT_SECRET = process.env.DISCORD_OAUTH_CLIENT_SECRET!
+export const DISCORD_OAUTH_REDIRECT_URI = process.env.DISCORD_OAUTH_REDIRECT_URI!
+export const DISCORD_SERVER_ID = process.env.DISCORD_SERVER_ID!
+export const JWT_SECRET = process.env.JWT_SECRET!

@@ -1,11 +1,15 @@
 import { Context } from "hono"
 import { setCookie } from "hono/cookie"
-import { Account } from "../models/Account.model"
+import db from "../db"
 
-export const getMyAccount = (c: Context) => {
+export const getMyAccount = async (c: Context) => {
     const payload = c.get("jwtPayload")
 
-    const account = Account.getFirst({ id: payload.id })
+    const account = await db.query.accounts.findFirst({
+        where: (accounts, { eq }) => eq(accounts.id, payload.id),
+        columns: { id: true, name: true, avatar: true },
+    })
+
     if (!account) {
         return c.json({ error: "Unauthorized" }, 401)
     }

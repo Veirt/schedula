@@ -20,22 +20,22 @@
         form: "",
     }
 
-    let currScheduleEntry: ScheduleEntry = {
+    let currScheduleEntry: CurrScheduleEntry = {
         classroom: "",
         course: "",
         lecturer: "",
-        start_time: "",
-        end_time: "",
+        startTime: "",
+        endTime: "",
         day: 0,
     }
-    let currScheduleChange: Partial<ScheduleChange> = {
-        schedule_id: undefined,
+    let currScheduleChange: Partial<CurrScheduleChange> = {
+        scheduleId: null,
         classroom: "",
-        start_time: "",
-        end_time: "",
+        startTime: "",
+        endTime: "",
         type: undefined,
-        scheduled_date: undefined,
-        transitioned_date: "",
+        scheduledDate: undefined,
+        transitionedDate: "",
     }
 
     let displayWeekend = false
@@ -58,8 +58,8 @@
 
 <NavBar bind:showCreateModal bind:showScheduleChangeModal />
 
-<UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
 <CreateFormModal on:fetchSchedule={fetchSchedule} bind:showCreateModal bind:currentDay />
+<UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
 <ScheduleChangeFormModal on:fetchSchedule={fetchSchedule} bind:showScheduleChangeModal bind:currScheduleChange />
 
 <main class="flex flex-col justify-center items-center mt-15">

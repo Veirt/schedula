@@ -8,7 +8,8 @@ import {
     DISCORD_SERVER_ID,
     JWT_SECRET,
 } from "../config/env"
-import { Account } from "../models/Account.model"
+import db from "../db"
+import { accounts } from "../db/schema/accounts/schema"
 
 export const discordCallback = async (c: Context) => {
     const code = c.req.query("code")
@@ -34,16 +35,26 @@ export const discordCallback = async (c: Context) => {
         return c.json({ error: "You are not in the server. You are not allowed to use this web." }, 403)
     }
 
-    const account = new Account({
-        id: userData.id,
-        name: userData.global_name,
-        avatar: userData.avatar,
-        access_token: authData.access_token,
-        refresh_token: authData.refresh_token,
-    })
-    account.insertOrUpdate()
+    await db
+        .insert(accounts)
+        .values({
+            id: userData.id,
+            name: userData.global_name,
+            avatar: userData.avatar,
+            accessToken: authData.access_token,
+            refreshToken: authData.refresh_token,
+        })
+        .onConflictDoUpdate({
+            target: accounts.id,
+            set: {
+                name: userData.global_name,
+                avatar: userData.avatar,
+                accessToken: authData.access_token,
+                refreshToken: authData.refresh_token,
+            },
+        })
 
-    const token = await sign({ id: account.id, name: account.name }, JWT_SECRET)
+    const token = await sign({ id: userData.id, name: userData.global_name }, JWT_SECRET)
     setCookie(c, "jwt", token)
     return c.redirect("/")
 }

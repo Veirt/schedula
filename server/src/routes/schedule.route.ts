@@ -4,20 +4,21 @@ import { jwt } from "hono/jwt"
 import { z } from "zod"
 import { JWT_SECRET } from "../config/env"
 import {
+    createSchedule,
     createScheduleChange,
-    createScheduleEntry,
+    deleteScheduleById,
     deleteScheduleChangeById,
-    deleteScheduleEntryById,
-    getScheduleChange,
+    getDefaultSchedules,
+    getScheduleById,
     getScheduleChangeById,
-    getScheduleEntryByDay,
-    getScheduleEntryById,
+    getScheduleChanges,
     getScheduleThisWeek,
+    getSchedulesByDay,
+    updateScheduleById,
     updateScheduleChangeById,
-    updateScheduleEntryById,
 } from "../controllers/schedule.controller"
-import { scheduleSchema } from "../models/Schedule.model"
-import { scheduleChangeSchema } from "../models/ScheduleChange.model"
+import { insertScheduleChangeSchema, updateScheduleChangeSchema } from "../db/schema/schedule_changes/handler"
+import { insertScheduleSchema, updateScheduleSchema } from "../db/schema/schedules/handler"
 
 // /api/schedule
 const scheduleRouter = new Hono()
@@ -36,13 +37,13 @@ scheduleRouter.use("/*", (c, next) => {
 scheduleRouter.get(
     "/changes",
     zValidator("query", z.object({ schedule_id: z.string().pipe(z.coerce.number()).optional() })),
-    getScheduleChange,
+    getScheduleChanges,
 )
 scheduleRouter.get("/changes/:id", getScheduleChangeById)
 scheduleRouter.patch(
     "/changes/:id",
     zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
-    zValidator("json", scheduleChangeSchema),
+    zValidator("json", updateScheduleChangeSchema),
     updateScheduleChangeById,
 )
 scheduleRouter.delete(
@@ -50,41 +51,40 @@ scheduleRouter.delete(
     zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
     deleteScheduleChangeById,
 )
-scheduleRouter.post("/changes", zValidator("json", scheduleChangeSchema), createScheduleChange)
+scheduleRouter.post("/changes", zValidator("json", insertScheduleChangeSchema), createScheduleChange)
+
+// Get default schedule
+scheduleRouter.get("/default", getDefaultSchedules)
 
 // Get schedule this week
 scheduleRouter.get("/", getScheduleThisWeek)
 
 // Create schedule entry
-scheduleRouter.post("/", zValidator("json", scheduleSchema), createScheduleEntry)
+scheduleRouter.post("/", zValidator("json", insertScheduleSchema), createSchedule)
 
 // Get schedule entry by id
-scheduleRouter.get(
-    "/:id",
-    zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
-    getScheduleEntryById,
-)
+scheduleRouter.get("/:id", zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })), getScheduleById)
 
 // Update schedule entry by id
 scheduleRouter.patch(
     "/:id",
     zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
-    zValidator("json", scheduleSchema),
-    updateScheduleEntryById,
+    zValidator("json", updateScheduleSchema),
+    updateScheduleById,
 )
 
 // Delete Schedule entry by id
 scheduleRouter.delete(
     "/:id",
     zValidator("param", z.object({ id: z.string().pipe(z.coerce.number()) })),
-    deleteScheduleEntryById,
+    deleteScheduleById,
 )
 
 // Get Schedule entry by day index
 scheduleRouter.get(
     "/day/:day",
     zValidator("param", z.object({ day: z.string().pipe(z.coerce.number().min(0).max(6)) })),
-    getScheduleEntryByDay,
+    getSchedulesByDay,
 )
 
 export default scheduleRouter

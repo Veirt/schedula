@@ -2,25 +2,33 @@
     import axios from "$lib/axios"
     import Modal from "$lib/components/Modal.svelte"
     import { schedule } from "$lib/store/schedule"
+    import { dayArray } from "$lib/utils/day"
     import { nextDay, type Day, formatRelative, isToday, compareAsc } from "date-fns"
     import { format } from "date-fns"
-    import { dayArray } from "$lib/utils/day"
-    import { createEventDispatcher } from "svelte"
+    import { createEventDispatcher, onMount } from "svelte"
 
     export let showScheduleChangeModal: { open: boolean; form: string }
+    export let currScheduleChange: Partial<CurrScheduleChange>
+
+    let scheduledDateOptions: Date[] = []
+    let defaultSchedules: Schedule[] = []
+    onMount(async () => {
+        const res = await axios.get("/api/schedule/default")
+        if (res.status === 200) {
+            defaultSchedules = res.data.data
+        }
+    })
 
     const dispatch = createEventDispatcher()
-
-    export let currScheduleChange: Partial<ScheduleChange>
-    let scheduledDateOptions: Date[] = []
 
     function getNextFourScheduledDate(day: Day, existingDate: string[]) {
         const result = []
 
         const today = new Date()
-        let now = new Date(`${format(today, "y-MM-dd")} ${currScheduleChange.start_time}`)
+        let now = new Date(`${format(today, "y-MM-dd")} ${currScheduleChange.startTime}`)
 
         // edge case when we want to input at the same day as the original scheduled date
+        // fix later
         if (isToday(currScheduleChange.date!) && compareAsc(today, now) !== 1) {
             if (existingDate.includes(format(now, "y-MM-dd"))) {
                 now = nextDay(now, day)
@@ -49,14 +57,20 @@
 
     function handleCourseChange() {
         // get data of the course
-        $schedule.forEach(async (sch) => {
-            const found = sch.find((currEntry) => currScheduleChange.schedule_id == currEntry.id)
+        Object.values($schedule).forEach(async (sch) => {
+            const found = sch.find((currEntry) => currScheduleChange.scheduleId == currEntry.id)
             if (found) {
-                currScheduleChange = { ...currScheduleChange, ...found }
+                currScheduleChange = {
+                    ...currScheduleChange,
+                    scheduleId: found.id,
+                    startTime: found.startTime,
+                    endTime: found.endTime,
+                    classroom: found.classroom,
+                }
 
                 // get existing schedule changes to check if there is any schedule changes
-                const existingScheduleChanges = await getExistingScheduleChanges(currScheduleChange.schedule_id!)
-                const existingDate = existingScheduleChanges.map((sc: ScheduleChange) => sc.scheduled_date)
+                const existingScheduleChanges = await getExistingScheduleChanges(currScheduleChange.scheduleId!)
+                const existingDate = existingScheduleChanges.map((sc: ScheduleChange) => sc.scheduledDate)
 
                 // fill the 'Schedule Date' options
                 scheduledDateOptions = getNextFourScheduledDate(found.day as Day, existingDate)
@@ -65,11 +79,11 @@
                 if (
                     !scheduledDateOptions
                         .map((sch) => format(sch, "y-MM-dd"))
-                        .includes(currScheduleChange.scheduled_date!)
+                        .includes(currScheduleChange.scheduledDate!)
                 ) {
-                    currScheduleChange.scheduled_date = undefined
+                    currScheduleChange.scheduledDate = null
                 } else {
-                    currScheduleChange.scheduled_date = (currScheduleChange as ScheduleEntry).change?.scheduled_date
+                    currScheduleChange.scheduledDate = (currScheduleChange as ScheduleChange).scheduledDate
                 }
             }
         })
@@ -86,13 +100,13 @@
         // reset the input when showScheduleChangeModal is closing
         if (!showScheduleChangeModal.open) {
             currScheduleChange = {
-                schedule_id: undefined,
+                scheduleId: null,
                 classroom: "",
-                start_time: "",
-                end_time: "",
-                type: undefined,
-                scheduled_date: undefined,
-                transitioned_date: "",
+                startTime: "",
+                endTime: "",
+                type: null,
+                scheduledDate: null,
+                transitionedDate: "",
             }
             scheduledDateOptions = []
         }
@@ -113,10 +127,7 @@
 
     async function updateScheduleChange() {
         try {
-            const res = await axios.patch(
-                `/api/schedule/changes/${currScheduleChange.sch_change_id}`,
-                currScheduleChange,
-            )
+            const res = await axios.patch(`/api/schedule/changes/${currScheduleChange.id}`, currScheduleChange)
 
             if (res.status === 200) {
                 showScheduleChangeModal = { open: false, form: "" }
@@ -139,31 +150,29 @@
         <label class="my-3" for="course">Course</label>
         <select
             required
-            bind:value={currScheduleChange.schedule_id}
+            bind:value={currScheduleChange.scheduleId}
             on:change={handleCourseChange}
             disabled={showScheduleChangeModal.form === "update"}
             class:cursor-not-allowed={showScheduleChangeModal.form === "update"}
             class="p-2 bg-alt"
             id="course">
-            <option value={undefined} selected hidden>Select a course</option>
-            {#each $schedule as scheduleEachDay}
-                {#each scheduleEachDay as scheduleEntry}
-                    <option value={scheduleEntry.id}>{dayArray[scheduleEntry.day]} - {scheduleEntry.course}</option>
-                {/each}
+            <option value={null} selected hidden>Select a course</option>
+            {#each defaultSchedules as schedule}
+                <option value={schedule.id}>{schedule.course}</option>
             {/each}
         </select>
 
         <label class="my-3" for="type">Type</label>
         <select required bind:value={currScheduleChange.type} class="p-2 bg-alt" id="type">
-            <option value={undefined} selected hidden>Select the type of schedule change </option>
+            <option value={null} selected hidden>Select the type of schedule change </option>
             <option value="transition">Transition / Pemindahan</option>
             <option value="cancellation">Cancellation / Jam Kosong</option>
         </select>
 
         {#if currScheduleChange.type}
             <label class="my-3" for="date">Scheduled Date</label>
-            <select bind:value={currScheduleChange.scheduled_date} required class="p-2 bg-alt" id="date">
-                <option hidden value={undefined}>Select the scheduled date</option>
+            <select bind:value={currScheduleChange.scheduledDate} required class="p-2 bg-alt" id="date">
+                <option hidden value={null}>Select the scheduled date</option>
                 {#each scheduledDateOptions as opt}
                     <option value={format(opt, "y-MM-dd")}
                         >{format(opt, "iiii, dd MMM yyyy")} - {formatRelative(opt, new Date())}</option>
@@ -174,7 +183,7 @@
         {#if currScheduleChange.type === "transition"}
             <label class="my-3" for="transitioned_date">Transitioned Date</label>
             <input
-                bind:value={currScheduleChange.transitioned_date}
+                bind:value={currScheduleChange.transitionedDate}
                 required
                 class="p-2 bg-alt"
                 type="date"
@@ -185,7 +194,7 @@
                     <label for="time-start">Start</label>
                     <input
                         required
-                        bind:value={currScheduleChange.start_time}
+                        bind:value={currScheduleChange.startTime}
                         id="time-start"
                         class="p-2 bg-alt"
                         type="text" />
@@ -194,7 +203,7 @@
                     <label for="time-end">End</label>
                     <input
                         required
-                        bind:value={currScheduleChange.end_time}
+                        bind:value={currScheduleChange.endTime}
                         id="time-end"
                         class="p-2 bg-alt"
                         type="text" />

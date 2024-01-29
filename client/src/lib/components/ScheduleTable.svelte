@@ -8,21 +8,21 @@
     export let currentDay: number
     export let showUpdateModal: boolean
     export let showScheduleChangeModal: { open: boolean; form: string }
-    export let currScheduleEntry: ScheduleEntry
-    export let currScheduleChange: Partial<ScheduleChange>
+    export let currScheduleEntry: CurrScheduleEntry
+    export let currScheduleChange: Partial<NewScheduleChange>
     export let displayAllEntry: boolean
 
     let showDelScheduleConfirm = false
     let showDelScheduleChangeConfirm = false
     let scheduleId: number | undefined
-    let scheduleChangeId: number | undefined
+    let scheduleChangeId: number | null
 
     const dispatch = createEventDispatcher()
 
     async function handleEditSchedule() {
         const res = await axios.get(`/api/schedule/${scheduleId}`)
 
-        currScheduleEntry = res.data.data.entry
+        currScheduleEntry = res.data.data
         showUpdateModal = true
     }
 
@@ -73,12 +73,12 @@
                     class:hidden={(scheduleEntry.type === "cancellation" ||
                         scheduleEntry.type === "transition-before") &&
                         !displayAllEntry}
-                    class:cancelled-row={scheduleEntry.change?.type === "cancellation"}
-                    class:transition-before-row={scheduleEntry.change?.type === "transition-before"}
-                    class:transition-after-row={scheduleEntry.change?.type === "transition-after"}>
+                    class:cancelled-row={scheduleEntry.type === "cancellation"}
+                    class:transition-before-row={scheduleEntry.type === "transition-before"}
+                    class:transition-after-row={scheduleEntry.type === "transition-after"}>
                     <td class="p-3 text-center border b-secondary">
                         <span> {scheduleEntry.date}<br /></span>
-                        {scheduleEntry.start_time} - {scheduleEntry.end_time}
+                        {scheduleEntry.startTime} - {scheduleEntry.endTime}
                     </td>
                     <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
                     <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
@@ -96,11 +96,11 @@
                                 <button
                                     on:click={() => {
                                         // if it is not a schedule change
-                                        if (!scheduleEntry.change?.type) {
+                                        if (!scheduleEntry.type) {
                                             scheduleId = scheduleEntry.id
                                             handleEditSchedule()
                                         } else {
-                                            scheduleChangeId = scheduleEntry.change.sch_change_id
+                                            scheduleChangeId = scheduleEntry.scheduleChangeId
                                             handleEditScheduleChange()
                                         }
                                     }}
@@ -108,11 +108,11 @@
                                     data-schedule-id={scheduleEntry.id}>Edit</button>
                                 <button
                                     on:click={() => {
-                                        if (!scheduleEntry.change?.type) {
+                                        if (!scheduleEntry.type) {
                                             scheduleId = scheduleEntry.id
                                             showDelScheduleConfirm = true
                                         } else {
-                                            scheduleChangeId = scheduleEntry.change.sch_change_id
+                                            scheduleChangeId = scheduleEntry.scheduleChangeId
                                             showDelScheduleChangeConfirm = true
                                         }
                                     }}

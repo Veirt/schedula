@@ -1,124 +1,145 @@
+import { Day } from "date-fns"
 import { Context, Env } from "hono"
 import z from "zod"
-import { Schedule, scheduleSchema } from "../models/Schedule.model"
-import { ScheduleChange, scheduleChangeSchema } from "../models/ScheduleChange.model"
+import { ScheduleHandler, insertScheduleSchema, updateScheduleSchema } from "../db/schema/schedules/handler"
+import {
+    ScheduleChangesHandler,
+    insertScheduleChangeSchema,
+    updateScheduleChangeSchema,
+} from "../db/schema/schedule_changes/handler"
 
-export const getScheduleThisWeek = (c: Context) => {
-    return c.json({ data: Schedule.getThisWeek() })
+export const getDefaultSchedules = async (c: Context) => {
+    const schedule = await ScheduleHandler.getAll()
+
+    return c.json({ data: schedule })
 }
 
-export const createScheduleEntry = async (c: Context<Env, "/", { out: { json: z.infer<typeof scheduleSchema> } }>) => {
-    const data = c.req.valid("json")
-
-    const newSchedule = new Schedule(data)
-    newSchedule.insert()
-
-    return c.json(null, 201)
-}
-
-export const getScheduleChange = (c: Context) => {
-    const scheduleId = c.req.query("schedule_id")
-    if (scheduleId) {
-        const scheduleChanges = ScheduleChange.getAll(parseInt(scheduleId))
-        return c.json({ data: scheduleChanges })
+export const getScheduleThisWeek = async (c: Context) => {
+    let scheduleThisWeek = await ScheduleHandler.getThisWeek()
+    // @ts-ignore
+    let scheduleThisWeekGrouped = Object.groupBy(
+        scheduleThisWeek,
+        ({ day, transitionedDay }: { day: Day; transitionedDay: Day }) =>
+            transitionedDay !== null ? transitionedDay : day,
+    )
+    scheduleThisWeekGrouped = {
+        0: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        ...scheduleThisWeekGrouped,
     }
-    const scheduleChanges = ScheduleChange.getAll()
 
-    return c.json({ data: scheduleChanges })
+    return c.json({ data: scheduleThisWeekGrouped })
 }
 
-export const getScheduleChangeById = (c: Context) => {
-    const scheduleChangeId = parseInt(c.req.param("id"))
-
-    const scheduleChange = ScheduleChange.getById(scheduleChangeId)
-
-    return c.json({ data: scheduleChange })
-}
-
-export const createScheduleChange = (
-    c: Context<Env, "/changes", { out: { json: z.infer<typeof scheduleChangeSchema> } }>,
-) => {
+export const createSchedule = async (c: Context<Env, "/", { out: { json: z.infer<typeof insertScheduleSchema> } }>) => {
     const data = c.req.valid("json")
+    await ScheduleHandler.insert(data)
 
-    const newScheduleChange = new ScheduleChange(data)
-    newScheduleChange.insert()
-
-    return c.json({}, 201)
+    return c.json({ success: true }, 201)
 }
 
-export const updateScheduleChangeById = (
-    c: Context<Env, "/changes/:id", { out: { json: z.infer<typeof scheduleChangeSchema> } }>,
-) => {
-    const id = c.req.param("id")
-    const data = c.req.valid("json")
-
-    const scheduleChange = new ScheduleChange({ sch_change_id: parseInt(id), ...data })
-    scheduleChange.update()
-
-    return c.json({ success: true }, 200)
-}
-
-export const deleteScheduleChangeById = (c: Context) => {
-    const id = c.req.param("id")
-
-    ScheduleChange.deleteById(parseInt(id))
-    return c.json({ success: true }, 200)
-}
-
-export const getScheduleEntryById = (c: Context) => {
+export const getScheduleById = async (c: Context) => {
     const id = parseInt(c.req.param("id"))
 
-    const entry = Schedule.getFirst({ id })
-    if (!entry) {
-        return c.json({ error: "Schedule Entry is not found", data: { entry: {} } }, 404)
+    const schedule = await ScheduleHandler.getById(id)
+    if (!schedule) {
+        return c.json({ success: false, error: "Schedule Entry is not found" }, 404)
     }
 
-    return c.json({ data: { entry } })
+    return c.json({ success: true, data: schedule })
 }
 
-export const updateScheduleEntryById = async (
-    c: Context<Env, "/:id", { out: { json: z.infer<typeof scheduleSchema> } }>,
+export const updateScheduleById = async (
+    c: Context<Env, "/:id", { out: { json: z.infer<typeof updateScheduleSchema> } }>,
 ) => {
     const id = parseInt(c.req.param("id"))
 
     const body = c.req.valid("json")
-    const entry = Schedule.getFirst({ id })
-    if (!entry) {
-        return c.json({ error: "Schedule Entry is not found", data: { entry: {} } }, 404)
+    const schedule = await ScheduleHandler.getById(id)
+    if (!schedule) {
+        return c.json({ success: false, error: "Schedule Entry is not found" }, 404)
     }
 
-    entry.day = body.day !== undefined ? body.day : entry.day
-    entry.start_time = body.start_time || entry.start_time
-    entry.end_time = body.end_time || entry.end_time
-    entry.classroom = body.classroom || entry.classroom
-    entry.lecturer = body.lecturer || entry.lecturer
-
-    const schedule = new Schedule(entry)
-    schedule.update()
+    Object.assign(schedule, body)
+    await ScheduleHandler.update(id, schedule)
 
     return c.json({ success: true }, 200)
 }
 
-export const deleteScheduleEntryById = (c: Context) => {
+export const deleteScheduleById = async (c: Context) => {
     const id = parseInt(c.req.param("id"))
 
-    const entry = Schedule.getFirst({ id })
-    if (!entry) {
-        return c.json({ error: "Schedule Entry is not found", data: { entry: {} } }, 404)
+    const schedule = await ScheduleHandler.getById(id)
+    if (!schedule) {
+        return c.json({ success: false, error: "Schedule Entry is not found" }, 404)
     }
-
-    const schedule = new Schedule({ ...entry })
-    schedule.delete()
+    await ScheduleHandler.deleteById(id)
 
     return c.json({ success: true }, 200)
 }
 
-export const getScheduleEntryByDay = (c: Context) => {
-    const day = parseInt(c.req.param("day"))
+export const getSchedulesByDay = async (c: Context) => {
+    const day = parseInt(c.req.param("day")) as Day
 
     return c.json({
-        data: {
-            schedule: Schedule.get({ day }),
-        },
+        success: true,
+        data: await ScheduleHandler.getByDay(day),
     })
+}
+
+export const getScheduleChanges = async (c: Context) => {
+    const scheduleId = c.req.query("schedule_id")
+    const scheduleChanges = await ScheduleChangesHandler.getAll(scheduleId ? parseInt(scheduleId) : undefined)
+
+    return c.json({ success: true, data: scheduleChanges })
+}
+
+export const getScheduleChangeById = async (c: Context) => {
+    const scheduleChangeId = parseInt(c.req.param("id"))
+
+    const scheduleChange = await ScheduleChangesHandler.getByid(scheduleChangeId)
+    if (!scheduleChange) {
+        return c.json({ success: false, data: {} }, 404)
+    }
+
+    return c.json({ success: true, data: scheduleChange })
+}
+
+export const createScheduleChange = async (
+    c: Context<Env, "/changes", { out: { json: z.infer<typeof insertScheduleChangeSchema> } }>,
+) => {
+    const data = c.req.valid("json")
+
+    await ScheduleChangesHandler.insert(data)
+
+    return c.json({ success: true }, 201)
+}
+
+export const updateScheduleChangeById = async (
+    c: Context<Env, "/changes/:id", { out: { json: z.infer<typeof updateScheduleChangeSchema> } }>,
+) => {
+    const id = parseInt(c.req.param("id"))
+    const body = c.req.valid("json")
+
+    const scheduleChange = await ScheduleChangesHandler.getByid(id)
+    if (!scheduleChange) {
+        return c.json({ sucess: false }, 404)
+    }
+
+    Object.assign(scheduleChange, body)
+    await ScheduleChangesHandler.update(id, scheduleChange)
+
+    return c.json({ success: true }, 200)
+}
+
+export const deleteScheduleChangeById = async (c: Context) => {
+    const id = parseInt(c.req.param("id"))
+    await ScheduleChangesHandler.deleteById(id)
+
+    return c.json({ success: true }, 200)
 }

@@ -10,12 +10,12 @@
 
     const dispatch = createEventDispatcher()
 
-    let newScheduleEntry: ScheduleEntry = {
+    let newScheduleEntry: Omit<CurrScheduleEntry, "id"> = {
         course: "",
         classroom: "",
         lecturer: "",
-        start_time: "",
-        end_time: "",
+        startTime: "",
+        endTime: "",
         day: currentDay,
     }
 
@@ -31,8 +31,8 @@
                 course: "",
                 classroom: "",
                 lecturer: "",
-                start_time: "",
-                end_time: "",
+                startTime: "",
+                endTime: "",
                 day: currentDay,
             }
 
@@ -43,13 +43,13 @@
 
     function getEndTime() {
         const timeRegex = new RegExp(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-        if (newScheduleEntry.start_time.match(timeRegex)) {
-            const date = new Date("2024-01-01 " + newScheduleEntry.start_time)
+        if (newScheduleEntry.startTime.match(timeRegex)) {
+            const date = new Date("2024-01-01 " + newScheduleEntry.startTime)
 
             // add 1 hour 30 minutes
             const addedTime = dayjs(date).add(1, "hour").add(30, "minute")
             const resultTime = addedTime.format("HH:mm")
-            newScheduleEntry.end_time = resultTime
+            newScheduleEntry.endTime = resultTime
         }
     }
 </script>
@@ -73,14 +73,14 @@
                 <input
                     required
                     on:change={getEndTime}
-                    bind:value={newScheduleEntry.start_time}
+                    bind:value={newScheduleEntry.startTime}
                     id="time-start"
                     class="p-2 bg-alt"
                     type="text" />
             </div>
             <div class="flex flex-col w-[45%] md:w-1/2">
                 <label for="time-end">End</label>
-                <input required bind:value={newScheduleEntry.end_time} id="time-end" class="p-2 bg-alt" type="text" />
+                <input required bind:value={newScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
             </div>
         </div>
 
