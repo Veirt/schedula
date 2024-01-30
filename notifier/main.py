@@ -60,6 +60,9 @@ def reset_schedule():
     schedule.clear("college_schedule")
     for day_index, sch in enumerate(current_schedule):
         for entry in sch:
+            # don't notify if it's transition-before/cancellation
+            if entry["type"] == "transition-before" or entry["type"] == "cancellation":
+                continue
             # subtract 30 minutes from the start time
             initial_datetime = datetime.strptime(entry["start_time"], "%H:%M")
             new_datetime = initial_datetime - timedelta(minutes=30)
