@@ -81,7 +81,7 @@ def get_schedule():
     try:
         res = requests.get(os.environ["SCHEDULE_API_URL"])
     except Exception as e:
-        logging.error(f"Cannot access Schedule API. Error: ${e}")
+        logging.error(f"Cannot access Schedule API. Error: {e}")
         return
 
     if os.path.exists("schedule.json"):
