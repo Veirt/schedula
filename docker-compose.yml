@@ -10,7 +10,7 @@ services:
       - DISCORD_OAUTH_REDIRECT_URI=
       - JWT_SECRET=
     volumes:
-      - ./server/db:/usr/src/app/db # db directory
+      - ./server/db:/app/db # db directory
     build:
       context: server
   client:
