@@ -10,7 +10,7 @@ services:
       - DISCORD_OAUTH_REDIRECT_URI=
       - JWT_SECRET=
     volumes:
-      - ./server/db.sqlite:/usr/src/app/db.sqlite
+      - ./server/db:/usr/src/app/db # db directory
     build:
       context: server
   client:

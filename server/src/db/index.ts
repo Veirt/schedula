@@ -5,7 +5,7 @@ import { accounts } from "./schema/accounts/schema"
 import { scheduleChanges, scheduleChangesRelations } from "./schema/schedule_changes/schema"
 import { schedules, schedulesRelations } from "./schema/schedules/schema"
 
-const sqlite = new Database(process.env.DATABASE_PATH || "./db.sqlite")
+const sqlite = new Database(process.env.DATABASE_PATH || "./db/db.sqlite")
 const db = drizzle(sqlite, {
     schema: { accounts, schedules, scheduleChanges, schedulesRelations, scheduleChangesRelations },
 })

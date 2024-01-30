@@ -10,6 +10,5 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 
 FROM base
 COPY --from=prod-deps /app/node_modules /app/node_modules
-RUN ["pnpm", "run", "migrate"]
 
-CMD [ "pnpm", "ts-node", "--transpile-only", "src/index.ts" ]
+CMD ["/bin/sh", "-c", "pnpm run migrate && pnpm ts-node --transpile-only src/index.ts"]
