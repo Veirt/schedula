@@ -77,7 +77,11 @@ def get_schedule():
     global current_schedule
     # logging.info("Getting schedule...")
 
-    res = requests.get(os.environ["SCHEDULE_API_URL"])
+    try:
+        res = requests.get(os.environ["SCHEDULE_API_URL"])
+    except Exception as e:
+        logging.error(f"Cannot access Schedule API. Error: ${e}")
+        return
 
     if os.path.exists("schedule.json"):
         with open("schedule.json", "r") as f:
