@@ -52,23 +52,24 @@ def schedule_every(day_index):
     raise Exception("Invalid day index")
 
 
-current_schedule = []
+current_schedule = {}
 
 
 # Resets the schedule. Called when initialising the program and when the schedule has changed.
 def reset_schedule():
     schedule.clear("college_schedule")
-    for day_index, sch in enumerate(current_schedule):
+    for day_index, sch in current_schedule.items():
         for entry in sch:
-            # don't notify if it's transition-before/cancellation
-            if entry["type"] == "transition-before" or entry["type"] == "cancellation":
+            if "type" in entry and (
+                entry["type"] == "transition-before" or entry["type"] == "cancellation"
+            ):
                 continue
             # subtract 30 minutes from the start time
-            initial_datetime = datetime.strptime(entry["start_time"], "%H:%M")
+            initial_datetime = datetime.strptime(entry["startTime"], "%H:%M")
             new_datetime = initial_datetime - timedelta(minutes=30)
             start_time = new_datetime.strftime("%H:%M")
 
-            schedule_every(day_index).at(start_time).do(
+            schedule_every(int(day_index)).at(start_time).do(
                 notify, f"{entry['course']}"
             ).tag("college_schedule")
 
@@ -85,7 +86,7 @@ def get_schedule():
 
     if os.path.exists("schedule.json"):
         with open("schedule.json", "r") as f:
-            if current_schedule == []:
+            if current_schedule == {}:
                 current_schedule = json.load(f)
                 reset_schedule()
                 return
@@ -110,5 +111,6 @@ def get_schedule():
 schedule.every(5).seconds.do(get_schedule).tag("get_schedule")
 
 while True:
+    print(schedule.get_jobs())
     schedule.run_pending()
     time.sleep(1)
