@@ -2,3 +2,4 @@
 venv/
 schedule.json
 .gitignore
+__pycache__

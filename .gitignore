@@ -2,3 +2,4 @@ docker-compose.dev.yml
 node_modules
 schedule.json
 .env
+__pycache__
