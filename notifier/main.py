@@ -89,8 +89,6 @@ def get_schedule():
             if current_schedule == {}:
                 current_schedule = json.load(f)
                 reset_schedule()
-                return
-            current_schedule = json.load(f)
     else:
         with open("schedule.json", "w") as f:
             json.dump(res.json()["data"], f)
@@ -111,6 +109,5 @@ def get_schedule():
 schedule.every(5).seconds.do(get_schedule).tag("get_schedule")
 
 while True:
-    print(schedule.get_jobs())
     schedule.run_pending()
     time.sleep(1)
