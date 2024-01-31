@@ -1,10 +1,11 @@
 {
   "name": "@schedula/server",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
     "generate": "drizzle-kit generate:sqlite",
     "push": "drizzle-kit push:sqlite",
-    "migrate": "ts-node -T src/db/migrate.ts"
+    "migrate": "tsx --no-warnings src/db/migrate.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.5.0",
@@ -15,8 +16,8 @@
     "drizzle-orm": "^0.29.3",
     "drizzle-zod": "^0.5.1",
     "hono": "^3.12.4",
-    "zod": "^3.22.4",
-    "ts-node": "^10.9.2"
+    "tsx": "^4.7.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.9",
