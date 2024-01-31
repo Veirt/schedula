@@ -8,13 +8,14 @@ import {
     DISCORD_SERVER_ID,
     JWT_SECRET,
 } from "../config/env"
-import db from "../db"
-import { accounts } from "../db/schema/accounts/schema"
+import { AccountHandler } from "../db/schema/accounts/handler"
+import { getDiscordUserData } from "../helpers/oauth.helper"
+import { DiscordAuthData, DiscordUserData } from "../types/discordOauth"
 
 export const discordCallback = async (c: Context) => {
     const code = c.req.query("code")
 
-    let authData: { access_token: string; refresh_token: string }
+    let authData: DiscordAuthData
     try {
         if (!code) throw Error("code is empty")
         authData = await getTokens(code)
@@ -23,9 +24,9 @@ export const discordCallback = async (c: Context) => {
         return c.json({ error: "invalid code" }, 400)
     }
 
-    let userData: { id: string; global_name: string; avatar: string }
+    let userData: DiscordUserData
     try {
-        userData = await getUserData(authData.access_token)
+        userData = await getDiscordUserData(authData.access_token)
     } catch (err) {
         console.error(`[discordCallback]: ${err}`)
         return c.json({ error: "failed getting user data" }, 500)
@@ -35,24 +36,7 @@ export const discordCallback = async (c: Context) => {
         return c.json({ error: "You are not in the server. You are not allowed to use this web." }, 403)
     }
 
-    await db
-        .insert(accounts)
-        .values({
-            id: userData.id,
-            name: userData.global_name,
-            avatar: userData.avatar,
-            accessToken: authData.access_token,
-            refreshToken: authData.refresh_token,
-        })
-        .onConflictDoUpdate({
-            target: accounts.id,
-            set: {
-                name: userData.global_name,
-                avatar: userData.avatar,
-                accessToken: authData.access_token,
-                refreshToken: authData.refresh_token,
-            },
-        })
+    await AccountHandler.upsert(userData, authData)
 
     const token = await sign({ id: userData.id, name: userData.global_name }, JWT_SECRET)
     setCookie(c, "jwt", token)
@@ -82,18 +66,6 @@ const getTokens = async (code: string) => {
     const authData = await res.json()
 
     return authData as { access_token: string; refresh_token: string }
-}
-
-const getUserData = async (accessToken: string) => {
-    const userRes = await fetch("https://discord.com/api/users/@me", {
-        headers: {
-            authorization: `Bearer ${accessToken}`,
-        },
-    })
-
-    const userData = await userRes.json()
-
-    return userData
 }
 
 const isUserInServer = async (accessToken: string) => {

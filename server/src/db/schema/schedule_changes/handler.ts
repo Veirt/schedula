@@ -19,7 +19,6 @@ const base = createInsertSchema(scheduleChanges, {
 })
 
 export const insertScheduleChangeSchema = base.refine((data) => {
-    console.log(data.startTime)
     const transitionedDate = new Date(`${data.transitionedDate} ${data.startTime}`)
     const currentDate = new Date()
 
