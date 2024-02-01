@@ -67,6 +67,7 @@
                     startTime: found.startTime,
                     endTime: found.endTime,
                     classroom: found.classroom,
+                    date: found.date,
                 }
 
                 // get existing schedule changes to check if there is any schedule changes
