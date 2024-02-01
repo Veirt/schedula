@@ -56,7 +56,7 @@
 </script>
 
 <div class="flex overflow-x-auto w-full md:justify-center">
-    <table class="mt-5 border table-fixed b-secondary">
+    <table class="mt-5 mb-10 border table-fixed b-secondary">
         <thead>
             <tr>
                 <td class="p-3 border b-secondary w-35">Time</td>
