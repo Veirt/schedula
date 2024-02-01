@@ -23,8 +23,8 @@
 
 <slot />
 
-<style lang="postcss">
+<style>
     :global(body) {
-        @apply bg-primary text-white;
+        --at-apply: bg-primary text-white;
     }
 </style>
