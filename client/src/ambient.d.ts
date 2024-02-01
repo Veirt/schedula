@@ -39,14 +39,15 @@ type ScheduleChange = {
 }
 
 type CurrScheduleChange = {
-    id: number
-    scheduleId: number | null
+    id?: number
+    scheduleId: number | null | undefined
     classroom: string
     startTime: string
     endTime: string
-    type: string | null
-    scheduledDate: string | null
+    type: string | null | undefined
+    scheduledDate: string | null | undefined
     transitionedDate: string
     date?: string
 }
+
 type NewScheduleChange = Omit<ScheduleChange, "id">

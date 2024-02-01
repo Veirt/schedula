@@ -4,12 +4,13 @@
     import { isLoggedIn } from "$lib/store/auth"
     import { schedule } from "$lib/store/schedule"
     import axios from "$lib/axios"
+    import { compareAsc } from "date-fns"
 
     export let currentDay: number
     export let showUpdateModal: boolean
     export let showScheduleChangeModal: { open: boolean; form: string }
     export let currScheduleEntry: CurrScheduleEntry
-    export let currScheduleChange: Partial<NewScheduleChange>
+    export let currScheduleChange: CurrScheduleChange
     export let displayAllEntry: boolean
 
     let showDelScheduleConfirm = false
@@ -18,6 +19,7 @@
     let scheduleChangeId: number | null
 
     const dispatch = createEventDispatcher()
+    const now = new Date()
 
     async function handleEditSchedule() {
         const res = await axios.get(`/api/schedule/${scheduleId}`)
@@ -75,7 +77,8 @@
                         !displayAllEntry}
                     class:cancelled-row={scheduleEntry.type === "cancellation"}
                     class:transition-before-row={scheduleEntry.type === "transition-before"}
-                    class:transition-after-row={scheduleEntry.type === "transition-after"}>
+                    class:transition-after-row={scheduleEntry.type === "transition-after"}
+                    class:done={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
                     <td class="p-3 text-center border b-secondary">
                         <span> {scheduleEntry.date}<br /></span>
                         {scheduleEntry.startTime} - {scheduleEntry.endTime}
@@ -134,16 +137,20 @@
     Are you sure you want to delete this schedule change?
 </ConfirmModal>
 
-<style lang="postcss">
+<style>
     .transition-before-row {
-        @apply bg-yellow-300/7;
+        --at-apply: bg-yellow-300/7 !important;
     }
 
     .transition-after-row {
-        @apply bg-green-300/7;
+        --at-apply: bg-blue-300/7 !important;
     }
 
     .cancelled-row {
-        @apply bg-red-500/20;
+        --at-apply: bg-red-500/20 !important;
+    }
+
+    .done {
+        --at-apply: bg-green-500/7;
     }
 </style>

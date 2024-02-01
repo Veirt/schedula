@@ -28,8 +28,8 @@
         endTime: "",
         day: 0,
     }
-    let currScheduleChange: Partial<CurrScheduleChange> = {
-        scheduleId: null,
+    let currScheduleChange: CurrScheduleChange = {
+        scheduleId: undefined,
         classroom: "",
         startTime: "",
         endTime: "",

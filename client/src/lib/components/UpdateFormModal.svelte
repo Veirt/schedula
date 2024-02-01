@@ -1,8 +1,10 @@
 <script lang="ts">
-    import axios from "$lib/axios"
     import Modal from "$lib/components/Modal.svelte"
+    import TimeInput from "./input/TimeInput.svelte"
+    import axios from "$lib/axios"
     import { days } from "$lib/utils/day"
     import { createEventDispatcher } from "svelte"
+    import TextInput from "./input/TextInput.svelte"
 
     export let showUpdateModal: boolean
     export let currScheduleEntry: CurrScheduleEntry
@@ -31,34 +33,17 @@
     <h2 class="text-xl" slot="title">Update Schedule Entry Form</h2>
     <form on:submit|preventDefault={updateScheduleEntry} class="flex flex-col" slot="contents">
         <label class="my-3" for="day">Day</label>
-
         <select bind:value={currScheduleEntry.day} required class="p-2 bg-alt" id="day">
             {#each days as day (day.index)}
                 <option selected={currScheduleEntry.day === day.index} value={day.index}>{day.name}</option>
             {/each}
         </select>
 
-        <div class="flex flex-row justify-between mt-3 w-full md:gap-5">
-            <div class="flex flex-col w-[45%] md:w-1/2">
-                <label for="time-start">Start</label>
-                <input
-                    required
-                    bind:value={currScheduleEntry.startTime}
-                    id="time-start"
-                    class="p-2 bg-alt"
-                    type="text" />
-            </div>
-            <div class="flex flex-col w-[45%] md:w-1/2">
-                <label for="time-end">End</label>
-                <input required bind:value={currScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
-            </div>
-        </div>
+        <TimeInput bind:startTime={currScheduleEntry.startTime} bind:endTime={currScheduleEntry.endTime} />
 
-        <label class="my-3" for="classroom">Classoom</label>
-        <input required bind:value={currScheduleEntry.classroom} id="classroom" class="p-2 bg-alt" type="text" />
+        <TextInput required bind:value={currScheduleEntry.classroom} name="classroom" id="classroom" />
 
-        <label class="my-3" for="lecturer">Lecturer(s)</label>
-        <input required bind:value={currScheduleEntry.lecturer} id="lecturer" class="p-2 bg-alt" type="text" />
+        <TextInput required bind:value={currScheduleEntry.lecturer} name="Lecturer(s)" id="lecturer" />
 
         <div class="my-3">
             <button class="p-2 px-4 w-24 rounded bg-alt" type="submit">Update</button>

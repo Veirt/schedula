@@ -1,9 +1,10 @@
 <script lang="ts">
-    import axios from "$lib/axios"
     import Modal from "$lib/components/Modal.svelte"
+    import TextInput from "$lib/components/input/TextInput.svelte"
+    import axios from "$lib/axios"
     import { days } from "$lib/utils/day"
-    import dayjs from "dayjs"
     import { createEventDispatcher } from "svelte"
+    import TimeInput from "./input/TimeInput.svelte"
 
     export let showCreateModal: boolean
     export let currentDay: number
@@ -40,25 +41,12 @@
             dispatch("fetchSchedule")
         }
     }
-
-    function getEndTime() {
-        const timeRegex = new RegExp(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-        if (newScheduleEntry.startTime.match(timeRegex)) {
-            const date = new Date("2024-01-01 " + newScheduleEntry.startTime)
-
-            // add 1 hour 30 minutes
-            const addedTime = dayjs(date).add(1, "hour").add(30, "minute")
-            const resultTime = addedTime.format("HH:mm")
-            newScheduleEntry.endTime = resultTime
-        }
-    }
 </script>
 
 <Modal bind:showModal={showCreateModal}>
     <h2 class="text-xl" slot="title">Create Schedule Entry Form</h2>
     <form on:submit|preventDefault={createScheduleEntry} class="flex flex-col" slot="contents">
-        <label class="my-3" for="course">Course</label>
-        <input required bind:value={newScheduleEntry.course} id="course" class="p-2 bg-alt" type="text" />
+        <TextInput required={true} bind:value={newScheduleEntry.course} name="course" id="course" />
 
         <label class="my-3" for="day">Day</label>
         <select required bind:value={newScheduleEntry.day} class="p-2 bg-alt" id="day">
@@ -67,28 +55,11 @@
             {/each}
         </select>
 
-        <div class="flex flex-row justify-between mt-3 w-full md:gap-5">
-            <div class="flex flex-col w-[45%] md:w-1/2">
-                <label for="time-start">Start</label>
-                <input
-                    required
-                    on:change={getEndTime}
-                    bind:value={newScheduleEntry.startTime}
-                    id="time-start"
-                    class="p-2 bg-alt"
-                    type="text" />
-            </div>
-            <div class="flex flex-col w-[45%] md:w-1/2">
-                <label for="time-end">End</label>
-                <input required bind:value={newScheduleEntry.endTime} id="time-end" class="p-2 bg-alt" type="text" />
-            </div>
-        </div>
+        <TimeInput bind:startTime={newScheduleEntry.startTime} bind:endTime={newScheduleEntry.endTime} />
 
-        <label class="my-3" for="classroom">Classoom</label>
-        <input required bind:value={newScheduleEntry.classroom} id="classroom" class="p-2 bg-alt" type="text" />
+        <TextInput bind:value={newScheduleEntry.classroom} required name="classroom" id="classroom" />
 
-        <label class="my-3" for="lecturer">Lecturer(s)</label>
-        <input required bind:value={newScheduleEntry.lecturer} id="lecturer" class="p-2 bg-alt" type="text" />
+        <TextInput bind:value={newScheduleEntry.lecturer} required name="Lecturer(s)" id="lecturer" />
 
         <div class="my-3">
             <button class="p-2 px-4 w-24 rounded bg-alt" type="submit">Create</button>

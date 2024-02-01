@@ -1,8 +1,9 @@
 <script lang="ts">
-    import axios from "$lib/axios"
+    import TimeInput from "./input/TimeInput.svelte"
+    import TextInput from "./input/TextInput.svelte"
     import Modal from "$lib/components/Modal.svelte"
+    import axios from "$lib/axios"
     import { schedule } from "$lib/store/schedule"
-    import { dayArray } from "$lib/utils/day"
     import { nextDay, type Day, formatRelative, isToday, compareAsc } from "date-fns"
     import { format } from "date-fns"
     import { createEventDispatcher, onMount } from "svelte"
@@ -189,29 +190,9 @@
                 type="date"
                 id="transitioned_date" />
 
-            <div class="flex flex-row justify-between mt-3 w-full md:gap-5">
-                <div class="flex flex-col w-[45%] md:w-1/2">
-                    <label for="time-start">Start</label>
-                    <input
-                        required
-                        bind:value={currScheduleChange.startTime}
-                        id="time-start"
-                        class="p-2 bg-alt"
-                        type="text" />
-                </div>
-                <div class="flex flex-col w-[45%] md:w-1/2">
-                    <label for="time-end">End</label>
-                    <input
-                        required
-                        bind:value={currScheduleChange.endTime}
-                        id="time-end"
-                        class="p-2 bg-alt"
-                        type="text" />
-                </div>
-            </div>
+            <TimeInput bind:startTime={currScheduleChange.startTime} bind:endTime={currScheduleChange.endTime} />
 
-            <label class="my-3" for="classroom">Classoom</label>
-            <input required bind:value={currScheduleChange.classroom} id="classroom" class="p-2 bg-alt" type="text" />
+            <TextInput required bind:value={currScheduleChange.classroom} id="classroom" name="classroom" />
         {/if}
 
         <div class="my-3">
