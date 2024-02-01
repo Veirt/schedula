@@ -1,4 +1,4 @@
-import { Day, add, eachDayOfInterval, format, startOfISOWeek } from "date-fns"
+import { Day, add, eachDayOfInterval, format, nextMonday, startOfISOWeek } from "date-fns"
 import { eq, sql } from "drizzle-orm"
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
@@ -41,6 +41,26 @@ export class ScheduleHandler {
         daysOfWeekFormatted.unshift(sunday)
 
         const statement = sql`
+        -- normal ones
+        SELECT
+          s.id,
+          s.course,
+          s.classroom,
+          s.lecturer,
+          s.start_time AS startTime,
+          s.end_time AS endTime,
+          s.day,
+          NULL AS scheduleChangeId,
+          NULL AS type,
+          NULL AS scheduledDate,
+          NULL AS transitionedDate,
+          NULL AS transitionedDay
+        FROM schedules s
+        WHERE s.id NOT IN (
+          SELECT schedule_id FROM schedule_changes WHERE scheduled_date BETWEEN ${monday} AND ${sunday}
+        )
+        UNION
+        -- transition-after and cancellation
         SELECT 
           s.id,
           s.course,
@@ -57,12 +77,13 @@ export class ScheduleHandler {
           sc.transitioned_date as transitionedDate,
           CAST(strftime('%w', sc.transitioned_date) AS number) AS transitionedDay
         FROM schedules s
-        LEFT JOIN schedule_changes sc ON s.id = sc.schedule_id AND
+        JOIN schedule_changes sc ON s.id = sc.schedule_id AND
         CASE
            WHEN type = 'transition' THEN transitioned_date BETWEEN ${monday} AND ${sunday}
            WHEN type = 'cancellation' THEN scheduled_date BETWEEN ${monday} AND ${sunday}
         END
         UNION
+        -- transition-before
         SELECT
             s.*,
           sc.id AS scheduleChangeId,
