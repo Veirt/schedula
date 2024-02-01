@@ -55,14 +55,45 @@
     }
 </script>
 
+<ConfirmModal bind:showConfirmModal={showDelScheduleConfirm} on:deleteConfirmed={handleDeleteSchedule}>
+    Are you sure you want to delete this entry?
+</ConfirmModal>
+
+<ConfirmModal bind:showConfirmModal={showDelScheduleChangeConfirm} on:deleteConfirmed={handleDeleteScheduleChange}>
+    Are you sure you want to delete this schedule change?
+</ConfirmModal>
+
+<div class="flex flex-col gap-2 items-start py-3 md:flex-row md:gap-5 px-15">
+    Keterangan:
+    <div class="flex gap-3 items-center">
+        <div class="w-4 h-4 transition-before-row"></div>
+        <p>Pemindahan (Sebelum)</p>
+    </div>
+
+    <div class="flex gap-3 items-center">
+        <div class="w-4 h-4 transition-after-row"></div>
+        <p>Pemindahan (Sesudah)</p>
+    </div>
+
+    <div class="flex gap-3 items-center">
+        <div class="w-4 h-4 cancelled-row"></div>
+        <p>Pembatalan</p>
+    </div>
+
+    <div class="flex gap-3 items-center">
+        <div class="w-4 h-4 done-row"></div>
+        <p>Selesai</p>
+    </div>
+</div>
+
 <div class="flex overflow-x-auto w-full md:justify-center">
     <table class="mt-5 mb-10 border table-fixed b-secondary">
         <thead>
             <tr>
-                <td class="p-3 border b-secondary w-35">Time</td>
-                <td class="p-3 border b-secondary w-35">Classroom</td>
-                <td class="p-3 w-80 border b-secondary">Course</td>
-                <td class="p-3 border w-70 b-secondary">Lecturer(s)</td>
+                <td class="p-3 text-center border b-secondary w-35">Time</td>
+                <td class="p-3 text-center border b-secondary w-35">Classroom</td>
+                <td class="p-3 w-80 text-center border b-secondary">Course</td>
+                <td class="p-3 text-center border w-70 b-secondary">Lecturer(s)</td>
                 {#if $isLoggedIn}
                     <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
                 {/if}
@@ -78,7 +109,7 @@
                     class:cancelled-row={scheduleEntry.type === "cancellation"}
                     class:transition-before-row={scheduleEntry.type === "transition-before"}
                     class:transition-after-row={scheduleEntry.type === "transition-after"}
-                    class:done={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
+                    class:done-row={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
                     <td class="p-3 text-center border b-secondary">
                         <span> {scheduleEntry.date}<br /></span>
                         {scheduleEntry.startTime} - {scheduleEntry.endTime}
@@ -129,28 +160,20 @@
     </table>
 </div>
 
-<ConfirmModal bind:showConfirmModal={showDelScheduleConfirm} on:deleteConfirmed={handleDeleteSchedule}>
-    Are you sure you want to delete this entry?
-</ConfirmModal>
-
-<ConfirmModal bind:showConfirmModal={showDelScheduleChangeConfirm} on:deleteConfirmed={handleDeleteScheduleChange}>
-    Are you sure you want to delete this schedule change?
-</ConfirmModal>
-
 <style>
     .transition-before-row {
-        --at-apply: bg-yellow-300/7 !important;
+        --at-apply: bg-yellow-300/13 !important;
     }
 
     .transition-after-row {
-        --at-apply: bg-blue-300/7 !important;
+        --at-apply: bg-blue-300/10 !important;
     }
 
     .cancelled-row {
-        --at-apply: bg-red-500/20 !important;
+        --at-apply: bg-red-500/10 !important;
     }
 
-    .done {
-        --at-apply: bg-green-500/7;
+    .done-row {
+        --at-apply: bg-green-500/10;
     }
 </style>
