@@ -18,6 +18,16 @@
     let scheduleId: number | undefined
     let scheduleChangeId: number | null
 
+    let scheduleView = "table"
+    let innerWidth = 0
+    let innerHeight = 0
+
+    $: if (innerWidth < 768) {
+        scheduleView = "card"
+    } else {
+        scheduleView = "table"
+    }
+
     const dispatch = createEventDispatcher()
     const now = new Date()
 
@@ -63,7 +73,9 @@
     Are you sure you want to delete this schedule change?
 </ConfirmModal>
 
-<div class="flex flex-col gap-2 items-start py-3 md:flex-row md:gap-5 px-15">
+<svelte:window bind:innerWidth bind:innerHeight />
+
+<div class="flex flex-col gap-2 items-start py-3 text-sm md:flex-row md:gap-5 px-15">
     Keterangan:
     <div class="flex gap-3 items-center">
         <div class="w-4 h-4 transition-before-row"></div>
@@ -86,79 +98,156 @@
     </div>
 </div>
 
-<div class="flex overflow-x-auto w-full md:justify-center">
-    <table class="mt-5 mb-10 border table-fixed b-secondary">
-        <thead>
-            <tr>
-                <td class="p-3 text-center border b-secondary w-35">Time</td>
-                <td class="p-3 text-center border b-secondary w-35">Classroom</td>
-                <td class="p-3 w-80 text-center border b-secondary">Course</td>
-                <td class="p-3 text-center border w-70 b-secondary">Lecturer(s)</td>
-                {#if $isLoggedIn}
-                    <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
-                {/if}
-            </tr>
-        </thead>
-        <tbody>
-            {#each $schedule[currentDay] as scheduleEntry}
-                {@const lecturers = scheduleEntry.lecturer.split("/")}
-                <tr
-                    class:hidden={(scheduleEntry.type === "cancellation" ||
-                        scheduleEntry.type === "transition-before") &&
-                        !displayAllEntry}
-                    class:cancelled-row={scheduleEntry.type === "cancellation"}
-                    class:transition-before-row={scheduleEntry.type === "transition-before"}
-                    class:transition-after-row={scheduleEntry.type === "transition-after"}
-                    class:done-row={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
-                    <td class="p-3 text-center border b-secondary">
-                        <span> {scheduleEntry.date}<br /></span>
-                        {scheduleEntry.startTime} - {scheduleEntry.endTime}
-                    </td>
-                    <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
-                    <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
-                    <td class="p-3 border text-[12px] b-secondary">
-                        <div class="flex flex-col">
-                            {#each lecturers as lecturer}
-                                <span class="p-1 my-1 rounded bg-alt">{lecturer}</span>
-                            {/each}
-                        </div>
-                    </td>
+<!-- <div class="flex gap-3"> -->
+<!--     <button -->
+<!--         on:click={() => (scheduleView = "table")} -->
+<!--         class="p-1 px-3 border border-alt" -->
+<!--         class:active-view={scheduleView === "table"}><div class="i-tabler:table-filled w-1em h-1em"></div></button> -->
+<!--     <button -->
+<!--         on:click={() => (scheduleView = "card")} -->
+<!--         class="p-1 px-3 border border-alt" -->
+<!--         class:active-view={scheduleView === "card"}><div class="i-material-symbols:list w-1em h-1em"></div></button> -->
+<!-- </div> -->
 
+{#if scheduleView === "table" && $schedule[currentDay].length > 0}
+    <div class="flex overflow-x-auto w-full md:w-[90%] md:justify-center">
+        <table class="mt-5 mb-10 border table-fixed b-secondary">
+            <thead>
+                <tr>
+                    <td class="p-3 text-center border b-secondary w-35">Time</td>
+                    <td class="p-3 text-center border b-secondary w-35">Classroom</td>
+                    <td class="p-3 w-80 text-center border b-secondary">Course</td>
+                    <td class="p-3 text-center border w-70 b-secondary">Lecturer(s)</td>
                     {#if $isLoggedIn}
-                        <td class="p-3 border b-secondary">
-                            <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
-                                <button
-                                    on:click={() => {
-                                        // if it is not a schedule change
-                                        if (!scheduleEntry.type) {
-                                            scheduleId = scheduleEntry.id
-                                            handleEditSchedule()
-                                        } else {
-                                            scheduleChangeId = scheduleEntry.scheduleChangeId
-                                            handleEditScheduleChange()
-                                        }
-                                    }}
-                                    class="py-2 px-5 rounded bg-alt"
-                                    data-schedule-id={scheduleEntry.id}>Edit</button>
-                                <button
-                                    on:click={() => {
-                                        if (!scheduleEntry.type) {
-                                            scheduleId = scheduleEntry.id
-                                            showDelScheduleConfirm = true
-                                        } else {
-                                            scheduleChangeId = scheduleEntry.scheduleChangeId
-                                            showDelScheduleChangeConfirm = true
-                                        }
-                                    }}
-                                    class="py-2 px-3 rounded bg-alt">Delete</button>
-                            </div>
-                        </td>
+                        <td class="p-3 text-center border b-secondary md:min-w-45">Action</td>
                     {/if}
                 </tr>
-            {/each}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                {#each $schedule[currentDay] as scheduleEntry}
+                    {@const lecturers = scheduleEntry.lecturer.split("/")}
+                    <tr
+                        class:hidden={(scheduleEntry.type === "cancellation" ||
+                            scheduleEntry.type === "transition-before") &&
+                            !displayAllEntry}
+                        class:cancelled-row={scheduleEntry.type === "cancellation"}
+                        class:transition-before-row={scheduleEntry.type === "transition-before"}
+                        class:transition-after-row={scheduleEntry.type === "transition-after"}
+                        class:done-row={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
+                        <td class="p-3 text-center border b-secondary">
+                            <span> {scheduleEntry.date}<br /></span>
+                            {scheduleEntry.startTime} - {scheduleEntry.endTime}
+                        </td>
+                        <td class="p-3 text-center border b-secondary">{scheduleEntry.classroom}</td>
+                        <td class="p-3 border text-[13px] b-secondary">{scheduleEntry.course}</td>
+                        <td class="p-3 border text-[12px] b-secondary">
+                            <div class="flex flex-col">
+                                {#each lecturers as lecturer}
+                                    <span class="p-1 my-1 rounded bg-alt">{lecturer}</span>
+                                {/each}
+                            </div>
+                        </td>
+
+                        {#if $isLoggedIn}
+                            <td class="p-3 border b-secondary">
+                                <div class="flex flex-col gap-2 justify-between m-auto md:flex-row">
+                                    <button
+                                        on:click={() => {
+                                            // if it is not a schedule change
+                                            if (!scheduleEntry.type) {
+                                                scheduleId = scheduleEntry.id
+                                                handleEditSchedule()
+                                            } else {
+                                                scheduleChangeId = scheduleEntry.scheduleChangeId
+                                                handleEditScheduleChange()
+                                            }
+                                        }}
+                                        class="py-2 px-5 rounded bg-alt"
+                                        data-schedule-id={scheduleEntry.id}>Edit</button>
+                                    <button
+                                        on:click={() => {
+                                            if (!scheduleEntry.type) {
+                                                scheduleId = scheduleEntry.id
+                                                showDelScheduleConfirm = true
+                                            } else {
+                                                scheduleChangeId = scheduleEntry.scheduleChangeId
+                                                showDelScheduleChangeConfirm = true
+                                            }
+                                        }}
+                                        class="py-2 px-3 rounded bg-alt">Delete</button>
+                                </div>
+                            </td>
+                        {/if}
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
+{:else if scheduleView === "card"}
+    {#each $schedule[currentDay] as scheduleEntry}
+        {@const lecturers = scheduleEntry.lecturer.split("/")}
+        <div class="my-3 p-5 w-[90%] md:w-[90%] bg-alt">
+            <div class="flex gap-3 items-center">
+                <div class="i-lets-icons:date-fill w-1em h-1em"></div>
+                <p>{scheduleEntry.date}</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <div class="i-mingcute:time-fill w-1em h-1em"></div>
+                <p>{scheduleEntry.startTime} - {scheduleEntry.endTime}</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <div class="i-material-symbols-light:book w-1em h-1em"></div>
+                <p>{scheduleEntry.course}</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <div class="i-ic:baseline-room w-1em h-1em"></div>
+                <p>{scheduleEntry.classroom}</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <div class="i-fluent:people-12-filled w-1em h-1em"></div>
+
+                <p>
+                    {#each lecturers as lecturer}
+                        <p>{lecturer}</p>
+                    {/each}
+                </p>
+            </div>
+
+            {#if $isLoggedIn}
+                <div class="flex gap-3 mt-3">
+                    <button
+                        on:click={() => {
+                            // if it is not a schedule change
+                            if (!scheduleEntry.type) {
+                                scheduleId = scheduleEntry.id
+                                handleEditSchedule()
+                            } else {
+                                scheduleChangeId = scheduleEntry.scheduleChangeId
+                                handleEditScheduleChange()
+                            }
+                        }}
+                        class="py-2 px-5 rounded bg-primary"
+                        data-schedule-id={scheduleEntry.id}>Edit</button>
+                    <button
+                        on:click={() => {
+                            if (!scheduleEntry.type) {
+                                scheduleId = scheduleEntry.id
+                                showDelScheduleConfirm = true
+                            } else {
+                                scheduleChangeId = scheduleEntry.scheduleChangeId
+                                showDelScheduleChangeConfirm = true
+                            }
+                        }}
+                        class="py-2 px-3 rounded bg-primary">Delete</button>
+                </div>
+            {/if}
+        </div>
+    {/each}
+{/if}
+
+{#if $schedule[currentDay].length === 0}
+    <p class="my-3 text-xl">No schedule.</p>
+{/if}
 
 <style>
     .transition-before-row {
