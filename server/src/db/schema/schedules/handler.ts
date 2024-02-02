@@ -29,12 +29,7 @@ export class ScheduleHandler {
             start: startOfWeek,
             end: add(startOfWeek, { days: 6 }),
         })
-        let daysOfWeekFormatted: string[] = []
-        daysOfWeek.forEach((day) => {
-            // format it to YYYY-MM-DD that database understands
-            const newFormat = format(day, "y-MM-dd")
-            daysOfWeekFormatted.push(newFormat)
-        })
+        const daysOfWeekFormatted: string[] = daysOfWeek.map((day) => format(day, "y-MM-dd"))
 
         const sunday = daysOfWeekFormatted.pop()!
         const monday = daysOfWeekFormatted[0]
