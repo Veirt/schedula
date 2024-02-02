@@ -75,39 +75,38 @@
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
-<div class="flex flex-col gap-2 items-start py-3 text-sm md:flex-row md:gap-5 px-15">
-    Keterangan:
-    <div class="flex gap-3 items-center">
-        <div class="w-4 h-4 transition-before-row"></div>
-        <p>Pemindahan (Sebelum)</p>
-    </div>
+<div class="h-8">
+    {#if $schedule[currentDay].length > 0}
+        {@const isTransitionBeforeExist =
+            $schedule[currentDay].find((sch) => sch.type === "transition-before") !== undefined}
+        {@const isTransitionAfterExist =
+            $schedule[currentDay].find((sch) => sch.type === "transition-after") !== undefined}
+        {@const isCancellationExist = $schedule[currentDay].find((sch) => sch.type === "cancellation") !== undefined}
+        {@const isDoneExist = $schedule[currentDay].some((sch) => compareAsc(now, `${sch.date} ${sch.endTime}`) === 1)}
 
-    <div class="flex gap-3 items-center">
-        <div class="w-4 h-4 transition-after-row"></div>
-        <p>Pemindahan (Sesudah)</p>
-    </div>
+        <div class="flex flex-col gap-2 items-start py-3 text-sm md:flex-row md:gap-5 px-15">
+            <div class:!hidden={!isTransitionBeforeExist} class="flex gap-3 items-center">
+                <div class="w-4 h-4 transition-before-row"></div>
+                <p>Pemindahan (Sebelum)</p>
+            </div>
 
-    <div class="flex gap-3 items-center">
-        <div class="w-4 h-4 cancelled-row"></div>
-        <p>Pembatalan</p>
-    </div>
+            <div class:!hidden={!isTransitionAfterExist} class="flex gap-3 items-center">
+                <div class="w-4 h-4 transition-after-row"></div>
+                <p>Pemindahan (Sesudah)</p>
+            </div>
 
-    <div class="flex gap-3 items-center">
-        <div class="w-4 h-4 done-row"></div>
-        <p>Selesai</p>
-    </div>
+            <div class:!hidden={!isCancellationExist} class="flex gap-3 items-center">
+                <div class="w-4 h-4 cancelled-row"></div>
+                <p>Pembatalan</p>
+            </div>
+
+            <div class:!hidden={!isDoneExist} class="flex gap-3 items-center">
+                <div class="w-4 h-4 done-row"></div>
+                <p>Selesai</p>
+            </div>
+        </div>
+    {/if}
 </div>
-
-<!-- <div class="flex gap-3"> -->
-<!--     <button -->
-<!--         on:click={() => (scheduleView = "table")} -->
-<!--         class="p-1 px-3 border border-alt" -->
-<!--         class:active-view={scheduleView === "table"}><div class="i-tabler:table-filled w-1em h-1em"></div></button> -->
-<!--     <button -->
-<!--         on:click={() => (scheduleView = "card")} -->
-<!--         class="p-1 px-3 border border-alt" -->
-<!--         class:active-view={scheduleView === "card"}><div class="i-material-symbols:list w-1em h-1em"></div></button> -->
-<!-- </div> -->
 
 {#if scheduleView === "table" && $schedule[currentDay].length > 0}
     <div class="flex overflow-x-auto w-full md:w-[90%] md:justify-center">
@@ -246,7 +245,7 @@
 {/if}
 
 {#if $schedule[currentDay].length === 0}
-    <p class="my-3 text-xl">No schedule.</p>
+    <p class="my-3 text-xl font-bold">No schedule.</p>
 {/if}
 
 <style>

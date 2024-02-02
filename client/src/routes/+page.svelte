@@ -65,15 +65,20 @@
 <main class="flex flex-col justify-center items-center mt-15">
     <h1 class="text-3xl">Schedule</h1>
     <WeekDayView bind:displayWeekend bind:currentDay />
-    <div class="flex flex-row gap-5 my-3">
+    <div class="flex flex-row gap-1 my-3">
         <div>
-            <input id="display-weekend" bind:checked={displayWeekend} type="checkbox" />
-            <label class="select-none" for="display-weekend">Display Weekend?</label>
+            <!-- <input id="display-weekend" bind:checked={displayWeekend} type="checkbox" /> -->
+            <button
+                class="p-2 border select-none b-alt"
+                class:bg-alt={displayWeekend}
+                on:click={() => (displayWeekend = !displayWeekend)}>Display Weekend</button>
         </div>
 
         <div>
-            <input id="display-all-entry" bind:checked={displayAllEntry} type="checkbox" />
-            <label class="select-none" for="display-all-entry">Display All Entry?</label>
+            <button
+                class="p-2 border select-none b-alt"
+                class:bg-alt={displayAllEntry}
+                on:click={() => (displayAllEntry = !displayAllEntry)}>Display All Entry</button>
         </div>
     </div>
 

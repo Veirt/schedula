@@ -36,7 +36,7 @@
         {#if $isLoggedIn === true}
             <button class="py-2 px-5 rounded bg-alt" on:click={() => (showCreateModal = true)}>Create</button>
             <button
-                class="py-2 px-5 rounded bg-alt"
+                class="py-2 px-5 mx-3 rounded bg-alt"
                 on:click={() => (showScheduleChangeModal = { open: true, form: "create" })}
                 >Create Schedule Change</button>
 
