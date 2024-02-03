@@ -1,14 +1,12 @@
-FROM node:21-alpine AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-COPY . /app
+FROM oven/bun:1-alpine as base
 WORKDIR /app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY package.json bun.lockb  ./
+RUN bun install --production --frozen-lockfile --no-cache
+COPY . .
 
-CMD ["/bin/sh", "-c", "pnpm run migrate && pnpm start"]
+CMD ["/bin/sh", "-c", "bun run migrate && bun run start"]

@@ -1,1 +1,12 @@
+schedule.json
+*.sqlite
+
 node_modules
+.editorconfig
+.git*
+.svelte-kit
+build
+.env*
+README.md
+Dockerfile
+README.md

@@ -1,0 +1,4 @@
+[install.lockfile]
+
+# whether to save the lockfile to disk
+save = true

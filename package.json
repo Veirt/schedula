@@ -5,10 +5,8 @@
     "dev:client": "bun --cwd client dev",
     "dev:server": "bun --cwd server dev",
     "dev:docker": "docker compose -f docker-compose.dev.yml up -d --build",
+    "start:server": "bun --cwd server start",
+    "build:client": "bun --cwd client build",
     "notifier": "source notifier/venv/bin/activate && python notifier/main.py"
-  },
-  "workspaces": [
-    "client",
-    "server"
-  ]
+  }
 }
