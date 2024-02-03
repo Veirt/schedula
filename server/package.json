@@ -1,14 +1,13 @@
 {
   "name": "@schedula/server",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts",
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun src/index.ts",
     "generate": "drizzle-kit generate:sqlite",
     "push": "drizzle-kit push:sqlite",
-    "migrate": "tsx --no-warnings src/db/migrate.ts"
+    "migrate": "bun src/db/migrate.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^1.5.0",
     "@hono/zod-validator": "^0.1.11",
     "better-sqlite3": "^9.3.0",
     "date-fns": "^3.3.0",
@@ -16,7 +15,6 @@
     "drizzle-orm": "^0.29.3",
     "drizzle-zod": "^0.5.1",
     "hono": "^3.12.4",
-    "tsx": "^4.7.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

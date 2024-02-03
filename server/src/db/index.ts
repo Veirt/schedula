@@ -1,5 +1,5 @@
-import Database from "better-sqlite3"
-import { drizzle } from "drizzle-orm/better-sqlite3"
+import { Database } from "bun:sqlite"
+import { drizzle } from "drizzle-orm/bun-sqlite"
 
 import { accounts } from "./schema/accounts/schema"
 import { scheduleChanges, scheduleChangesRelations } from "./schema/schedule_changes/schema"

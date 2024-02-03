@@ -47,7 +47,15 @@ export class ScheduleChangesHandler {
     }
 
     static async getByid(id: number) {
-        return await db.query.scheduleChanges.findFirst({ where: eq(scheduleChanges.id, id) })
+        // return await db.query.scheduleChanges.findFirst({ where: eq(scheduleChanges.id, id) })
+
+        const scheduleChangeRes = await db.select().from(scheduleChanges).where(eq(scheduleChanges.id, id)).limit(1)
+        if (scheduleChangeRes.length === 0) {
+            return undefined
+        }
+
+        const scheduleChange = scheduleChangeRes[0]
+        return scheduleChange
     }
 
     static async insert(scheduleChange: NewScheduleChange) {

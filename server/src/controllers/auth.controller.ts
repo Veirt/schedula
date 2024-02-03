@@ -1,15 +1,12 @@
 import { Context } from "hono"
 import { setCookie } from "hono/cookie"
-import db from "../db"
 import { getDiscordUserData, refreshDiscordAccessToken } from "../helpers/oauth.helper"
 import { AccountHandler } from "../db/schema/accounts/handler"
 
 export const getMyAccount = async (c: Context) => {
     const payload = c.get("jwtPayload")
 
-    const account = await db.query.accounts.findFirst({
-        where: (accounts, { eq }) => eq(accounts.id, payload.id),
-    })
+    const account = await AccountHandler.getByid(payload.id)
 
     if (!account) {
         return c.json({ error: "Unauthorized" }, 401)

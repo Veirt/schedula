@@ -114,11 +114,27 @@ export class ScheduleHandler {
     }
 
     static async getById(id: number) {
-        return await db.query.schedules.findFirst({ where: eq(schedules.id, id) })
+        // return await db.query.schedules.findFirst({ where: eq(schedules.id, id) })
+
+        const scheduleRes = await db.select().from(schedules).where(eq(schedules.id, id)).limit(1)
+        if (scheduleRes.length === 0) {
+            return undefined
+        }
+
+        const schedule = scheduleRes[0]
+        return schedule
     }
 
     static async getByDay(dayIndex: Day) {
-        return await db.query.schedules.findFirst({ where: eq(schedules.day, dayIndex) })
+        // return await db.query.schedules.findFirst({ where: eq(schedules.day, dayIndex) })
+
+        const scheduleRes = await db.select().from(schedules).where(eq(schedules.day, dayIndex)).limit(1)
+        if (scheduleRes.length === 0) {
+            return undefined
+        }
+
+        const schedule = scheduleRes[0]
+        return schedule
     }
 
     static async insert(sch: NewSchedule) {
