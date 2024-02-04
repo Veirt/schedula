@@ -18,7 +18,8 @@
     on:click|self={() => dialog.close()}>
     <div class="flex flex-row justify-between items-center border-b-2 b-secondary">
         <slot name="title" />
-        <div class="p-2">x</div>
+        <button on:click={() => dialog.close()} class="p-2"
+            ><div class="i-material-symbols:close w-1em h-1em"></div></button>
     </div>
     <slot name="contents" />
 </dialog>
