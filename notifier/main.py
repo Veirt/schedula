@@ -25,12 +25,14 @@ if os.environ.get("DISCORD_WEBHOOK_URL") is None:
     raise Exception("DISCORD_WEBHOOK_URL is not set")
 
 
-def notify(course):
+def notify(entry):
     # send over discord webhook
-    logging.info(f"Notifying: {course}")
+    logging.info(f"Notifying: {entry['course']}")
     requests.post(
         os.environ["DISCORD_WEBHOOK_URL"],
-        json={"content": f"Reminder: {course} will start in 30 minutes."},
+        json={
+            "content": f"Reminder: {entry['course']} will start in 30 minutes. ({entry['classroom']})"
+        },
     )
 
 
@@ -57,9 +59,9 @@ class ScheduleManager:
                 new_datetime = initial_datetime - timedelta(minutes=30)
                 start_time = new_datetime.strftime("%H:%M")
 
-                schedule_every(int(day_index)).at(start_time).do(
-                    notify, f"{entry['course']}"
-                ).tag("college_schedule")
+                schedule_every(int(day_index)).at(start_time).do(notify, entry).tag(
+                    "college_schedule"
+                )
 
     def get_schedule(self):
         try:
