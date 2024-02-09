@@ -6,19 +6,20 @@
     import { schedule } from "$lib/store/schedule"
     import { nextDay, type Day, formatRelative, isToday, compareAsc } from "date-fns"
     import { format } from "date-fns"
-    import { createEventDispatcher, onMount } from "svelte"
+    import { createEventDispatcher } from "svelte"
 
     export let showScheduleChangeModal: { open: boolean; form: string }
     export let currScheduleChange: Partial<CurrScheduleChange>
 
     let scheduledDateOptions: Date[] = []
     let defaultSchedules: Schedule[] = []
-    onMount(async () => {
+
+    async function fetchDefaultSchedule() {
         const res = await axios.get("/api/schedule/default")
         if (res.status === 200) {
             defaultSchedules = res.data.data
         }
-    })
+    }
 
     const dispatch = createEventDispatcher()
 
@@ -91,10 +92,15 @@
         })
     }
 
-    // trigger handleCourseChange when updating to fill out the scheduled date
     $: {
+        // trigger handleCourseChange when updating to fill out the scheduled date
         if (showScheduleChangeModal.open && showScheduleChangeModal.form === "update") {
             if (scheduledDateOptions.length === 0) handleCourseChange()
+        }
+
+        // get course everytime opening the form
+        if (showScheduleChangeModal.open) {
+            fetchDefaultSchedule()
         }
     }
 
