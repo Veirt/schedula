@@ -5,7 +5,7 @@
     import CreateFormModal from "$lib/components/CreateFormModal.svelte"
     import ScheduleChangeFormModal from "$lib/components/ScheduleChangeFormModal.svelte"
     import NavBar from "$lib/components/NavBar.svelte"
-    import { dev } from "$app/environment"
+    import { browser, dev } from "$app/environment"
     import { onMount } from "svelte"
     import axios from "$lib/axios"
     import { schedule } from "$lib/store/schedule"
@@ -44,26 +44,46 @@
         displayAllEntry = true
     }
 
-    const fetchSchedule = async () => {
-        const res = await axios.get("/api/schedule")
+    const fetchSchedule = async (nextNWeeks?: number) => {
+        const n = nextNWeeks || 0
+        const res = await axios.get(`/api/schedule?nextNWeeks=${n}`)
 
         schedule.set(res.data.data)
+        loading = false
     }
 
-    onMount(async () => {
-        await fetchSchedule()
-        loading = false
-    })
+    let nextNWeeks = 0
+    $: if (browser) nextNWeeks, fetchSchedule(nextNWeeks)
 </script>
 
 <NavBar bind:showCreateModal bind:showScheduleChangeModal />
 
-<CreateFormModal on:fetchSchedule={fetchSchedule} bind:showCreateModal bind:currentDay />
-<UpdateFormModal on:fetchSchedule={fetchSchedule} bind:showUpdateModal bind:currScheduleEntry />
-<ScheduleChangeFormModal on:fetchSchedule={fetchSchedule} bind:showScheduleChangeModal bind:currScheduleChange />
+<CreateFormModal on:fetchSchedule={() => fetchSchedule()} bind:showCreateModal bind:currentDay />
+<UpdateFormModal on:fetchSchedule={() => fetchSchedule()} bind:showUpdateModal bind:currScheduleEntry />
+<ScheduleChangeFormModal
+    on:fetchSchedule={() => fetchSchedule()}
+    bind:showScheduleChangeModal
+    bind:currScheduleChange />
 
 <main class="flex flex-col justify-center items-center mt-15">
-    <h1 class="text-3xl">Schedule</h1>
+    <div class="flex gap-3 items-center">
+        <button on:click={() => nextNWeeks--}><div class="i-bx:left-arrow w-1em h-1em"></div></button>
+        <h1 class="text-2xl">Schedule</h1>
+        <button on:click={() => nextNWeeks++}><div class="i-bx:right-arrow w-1em h-1em"></div> </button>
+    </div>
+    <h2 class="text-xl">
+        {#if nextNWeeks == 0}
+            This Week
+        {:else if nextNWeeks == 1}
+            Next Week
+        {:else if nextNWeeks == -1}
+            Last Week
+        {:else if nextNWeeks > 1}
+            Next {nextNWeeks} weeks
+        {:else}
+            Last {-nextNWeeks} week(s)
+        {/if}
+    </h2>
     <WeekDayView bind:displayWeekend bind:currentDay />
     <div class="flex flex-row gap-1 my-3">
         <div>
@@ -86,7 +106,7 @@
         <p>Loading...</p>
     {:else}
         <ScheduleTable
-            on:fetchSchedule={fetchSchedule}
+            on:fetchSchedule={() => fetchSchedule()}
             bind:displayAllEntry
             bind:currScheduleEntry
             bind:currScheduleChange

@@ -14,15 +14,20 @@ export const getDefaultSchedules = async (c: Context) => {
     return c.json({ data: schedule })
 }
 
-export const getScheduleThisWeek = async (c: Context) => {
-    let scheduleThisWeek = await ScheduleHandler.getThisWeek()
+export const getSchedule = async (c: Context) => {
+    const nextNWeeks = c.req.query("nextNWeeks")
+    let schedule
+    if (nextNWeeks) {
+        schedule = await ScheduleHandler.get(parseInt(nextNWeeks))
+    } else {
+        schedule = await ScheduleHandler.get()
+    }
+
     // @ts-ignore
-    let scheduleThisWeekGrouped = Object.groupBy(
-        scheduleThisWeek,
-        ({ day, transitionedDay }: { day: Day; transitionedDay: Day }) =>
-            transitionedDay !== null ? transitionedDay : day,
+    let grouped = Object.groupBy(schedule, ({ day, transitionedDay }: { day: Day; transitionedDay: Day }) =>
+        transitionedDay !== null ? transitionedDay : day,
     )
-    scheduleThisWeekGrouped = {
+    grouped = {
         0: [],
         1: [],
         2: [],
@@ -30,10 +35,10 @@ export const getScheduleThisWeek = async (c: Context) => {
         4: [],
         5: [],
         6: [],
-        ...scheduleThisWeekGrouped,
+        ...grouped,
     }
 
-    return c.json({ data: scheduleThisWeekGrouped })
+    return c.json({ data: grouped })
 }
 
 export const createSchedule = async (c: Context<Env, "/", { out: { json: z.infer<typeof insertScheduleSchema> } }>) => {

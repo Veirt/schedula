@@ -22,8 +22,11 @@ export class ScheduleHandler {
         return await db.query.schedules.findMany()
     }
 
-    static async getThisWeek() {
-        const startOfWeek = startOfISOWeek(new Date())
+    static async get(nextNWeeks?: number) {
+        let startOfWeek = startOfISOWeek(new Date())
+        if (nextNWeeks !== undefined) {
+            startOfWeek = add(startOfWeek, { weeks: nextNWeeks })
+        }
 
         const daysOfWeek = eachDayOfInterval({
             start: startOfWeek,

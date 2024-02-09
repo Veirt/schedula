@@ -12,7 +12,7 @@ import {
     getScheduleById,
     getScheduleChangeById,
     getScheduleChanges,
-    getScheduleThisWeek,
+    getSchedule,
     getSchedulesByDay,
     updateScheduleById,
     updateScheduleChangeById,
@@ -57,7 +57,11 @@ scheduleRouter.post("/changes", zValidator("json", insertScheduleChangeSchema), 
 scheduleRouter.get("/default", getDefaultSchedules)
 
 // Get schedule this week
-scheduleRouter.get("/", getScheduleThisWeek)
+scheduleRouter.get(
+    "/",
+    zValidator("query", z.object({ nextNWeeks: z.string().pipe(z.coerce.number()).optional() })),
+    getSchedule,
+)
 
 // Create schedule entry
 scheduleRouter.post("/", zValidator("json", insertScheduleSchema), createSchedule)
