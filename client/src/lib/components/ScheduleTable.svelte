@@ -63,6 +63,14 @@
 
         showDelScheduleChangeConfirm = false
     }
+
+    function isChangeDeletable(scheduleEntry: ScheduleThisWeek) {
+        if (scheduleEntry.type) {
+            return now > new Date(`${scheduleEntry.date} ${scheduleEntry.endTime}`)
+        }
+
+        return false
+    }
 </script>
 
 <ConfirmModal bind:showConfirmModal={showDelScheduleConfirm} on:deleteConfirmed={handleDeleteSchedule}>
@@ -173,6 +181,8 @@
                                                 showDelScheduleChangeConfirm = true
                                             }
                                         }}
+                                        disabled={isChangeDeletable(scheduleEntry)}
+                                        class:cursor-not-allowed={isChangeDeletable(scheduleEntry)}
                                         class="py-2 px-3 rounded bg-alt">Delete</button>
                                 </div>
                             </td>
