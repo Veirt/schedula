@@ -30,9 +30,9 @@
         let now = new Date(`${format(today, "y-MM-dd")} ${currScheduleChange.startTime}`)
 
         // edge case when we want to input at the same day as the original scheduled date
-        // fix later
         if (isToday(currScheduleChange.date!) && compareAsc(today, now) !== 1) {
-            if (existingDate.includes(format(now, "y-MM-dd"))) {
+            // I would still want to show it if it's update form
+            if (existingDate.includes(format(now, "y-MM-dd")) && showScheduleChangeModal.form === "create") {
                 now = nextDay(now, day)
             } else {
                 result.push(now)
