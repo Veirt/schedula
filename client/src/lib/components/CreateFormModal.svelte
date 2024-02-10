@@ -1,15 +1,16 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte"
+    import Button from "$lib/components/Button.svelte"
     import TextInput from "$lib/components/input/TextInput.svelte"
+    import TimeInput from "$lib/components/input/TimeInput.svelte"
     import axios from "$lib/axios"
     import { days } from "$lib/utils/day"
     import { createEventDispatcher } from "svelte"
-    import TimeInput from "./input/TimeInput.svelte"
+
+    const dispatch = createEventDispatcher()
 
     export let showCreateModal: boolean
     export let currentDay: number
-
-    const dispatch = createEventDispatcher()
 
     let newScheduleEntry: Omit<CurrScheduleEntry, "id"> = {
         course: "",
@@ -19,10 +20,12 @@
         endTime: "",
         day: currentDay,
     }
+    let isLoading = false
 
     $: newScheduleEntry.day = currentDay
 
     async function createScheduleEntry() {
+        isLoading = true
         const res = await axios.post("/api/schedule", newScheduleEntry)
 
         // success
@@ -40,6 +43,7 @@
             showCreateModal = false
             dispatch("fetchSchedule")
         }
+        isLoading = false
     }
 </script>
 
@@ -62,7 +66,7 @@
         <TextInput bind:value={newScheduleEntry.lecturer} required name="Lecturer(s)" id="lecturer" />
 
         <div class="my-3">
-            <button class="p-2 px-4 w-24 rounded bg-alt" type="submit">Create</button>
+            <Button type="submit" disabled={isLoading} loading={isLoading}>Create</Button>
         </div>
     </form>
 </Modal>

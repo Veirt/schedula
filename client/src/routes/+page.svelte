@@ -6,7 +6,6 @@
     import ScheduleChangeFormModal from "$lib/components/ScheduleChangeFormModal.svelte"
     import NavBar from "$lib/components/NavBar.svelte"
     import { browser, dev } from "$app/environment"
-    import { onMount } from "svelte"
     import axios from "$lib/axios"
     import { schedule } from "$lib/store/schedule"
 
@@ -44,24 +43,25 @@
         displayAllEntry = true
     }
 
+    let nextNWeeks = 0
+    $: if (browser) nextNWeeks, fetchSchedule(nextNWeeks)
+
     const fetchSchedule = async (nextNWeeks?: number) => {
         const n = nextNWeeks || 0
         const res = await axios.get(`/api/schedule?nextNWeeks=${n}`)
 
         schedule.set(res.data.data)
+
         loading = false
     }
-
-    let nextNWeeks = 0
-    $: if (browser) nextNWeeks, fetchSchedule(nextNWeeks)
 </script>
 
 <NavBar bind:showCreateModal bind:showScheduleChangeModal />
 
-<CreateFormModal on:fetchSchedule={() => fetchSchedule()} bind:showCreateModal bind:currentDay />
-<UpdateFormModal on:fetchSchedule={() => fetchSchedule()} bind:showUpdateModal bind:currScheduleEntry />
+<CreateFormModal on:fetchSchedule={() => fetchSchedule(nextNWeeks)} bind:showCreateModal bind:currentDay />
+<UpdateFormModal on:fetchSchedule={() => fetchSchedule(nextNWeeks)} bind:showUpdateModal bind:currScheduleEntry />
 <ScheduleChangeFormModal
-    on:fetchSchedule={() => fetchSchedule()}
+    on:fetchSchedule={() => fetchSchedule(nextNWeeks)}
     bind:showScheduleChangeModal
     bind:currScheduleChange />
 
@@ -106,7 +106,7 @@
         <p>Loading...</p>
     {:else}
         <ScheduleTable
-            on:fetchSchedule={() => fetchSchedule()}
+            on:fetchSchedule={() => fetchSchedule(nextNWeeks)}
             bind:displayAllEntry
             bind:currScheduleEntry
             bind:currScheduleChange

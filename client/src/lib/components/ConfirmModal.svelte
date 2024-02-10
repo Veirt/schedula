@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte"
     import Modal from "./Modal.svelte"
+    import { createEventDispatcher } from "svelte"
 
     const dispatch = createEventDispatcher()
 

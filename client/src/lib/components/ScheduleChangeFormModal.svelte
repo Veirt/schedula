@@ -7,12 +7,14 @@
     import { nextDay, type Day, formatRelative, isToday, compareAsc } from "date-fns"
     import { format } from "date-fns"
     import { createEventDispatcher } from "svelte"
+    import Button from "./Button.svelte"
 
     export let showScheduleChangeModal: { open: boolean; form: string }
     export let currScheduleChange: Partial<CurrScheduleChange>
 
     let scheduledDateOptions: Date[] = []
     let defaultSchedules: Schedule[] = []
+    let isLoading = false
 
     async function fetchDefaultSchedule() {
         const res = await axios.get("/api/schedule/default")
@@ -121,6 +123,7 @@
     }
 
     async function createScheduleChange() {
+        isLoading = true
         try {
             const res = await axios.post("/api/schedule/changes", currScheduleChange)
 
@@ -131,9 +134,11 @@
         } catch (err) {
             // TODO: handle later
         }
+        isLoading = false
     }
 
     async function updateScheduleChange() {
+        isLoading = true
         try {
             const res = await axios.patch(`/api/schedule/changes/${currScheduleChange.id}`, currScheduleChange)
 
@@ -144,11 +149,12 @@
         } catch (err) {
             // TODO: handle later
         }
+        isLoading = false
     }
 </script>
 
 <Modal bind:showModal={showScheduleChangeModal.open}>
-    <h2 class="text-xl" slot="title">Schedule Change Form: {showScheduleChangeModal.form}</h2>
+    <h2 class="text-xl capitalize" slot="title">{showScheduleChangeModal.form} Schedule Change Form</h2>
     <form
         on:submit|preventDefault={showScheduleChangeModal.form === "create"
             ? createScheduleChange
@@ -203,9 +209,9 @@
         {/if}
 
         <div class="my-3">
-            <button class="p-2 px-4 w-24 capitalize rounded bg-alt" type="submit">
+            <Button type="submit" disabled={isLoading} loading={isLoading}>
                 {showScheduleChangeModal.form}
-            </button>
+            </Button>
         </div>
     </form>
 </Modal>

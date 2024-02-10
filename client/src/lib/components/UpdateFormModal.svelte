@@ -1,17 +1,21 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte"
+    import Button from "$lib/components/Button.svelte"
+    import TextInput from "./input/TextInput.svelte"
     import TimeInput from "./input/TimeInput.svelte"
     import axios from "$lib/axios"
     import { days } from "$lib/utils/day"
     import { createEventDispatcher } from "svelte"
-    import TextInput from "./input/TextInput.svelte"
+
+    const dispatch = createEventDispatcher()
 
     export let showUpdateModal: boolean
     export let currScheduleEntry: CurrScheduleEntry
 
-    const dispatch = createEventDispatcher()
+    let isLoading = false
 
     async function updateScheduleEntry() {
+        isLoading = true
         const { id, course, day, startTime, endTime, classroom, lecturer } = currScheduleEntry
         const res = await axios.patch(`/api/schedule/${id}`, {
             course,
@@ -26,6 +30,7 @@
             showUpdateModal = false
             dispatch("fetchSchedule")
         }
+        isLoading = false
     }
 </script>
 
@@ -46,7 +51,7 @@
         <TextInput required bind:value={currScheduleEntry.lecturer} name="Lecturer(s)" id="lecturer" />
 
         <div class="my-3">
-            <button class="p-2 px-4 w-24 rounded bg-alt" type="submit">Update</button>
+            <Button type="submit" disabled={isLoading} loading={isLoading}>Update</Button>
         </div>
     </form>
 </Modal>
