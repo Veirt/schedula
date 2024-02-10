@@ -5,7 +5,7 @@
     export let displayWeekend: boolean
 </script>
 
-<div class="flex flex-wrap justify-center mt-5 md:flex-row">
+<div class="flex flex-wrap justify-center mx-3 mt-5 md:flex-row">
     {#each days as day (day.index)}
         <button
             data-day-idx={day.index}

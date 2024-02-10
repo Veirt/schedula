@@ -83,7 +83,7 @@
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
-<div class="h-8">
+<div>
     {#if $schedule[currentDay].length > 0}
         {@const isTransitionBeforeExist =
             $schedule[currentDay].find((sch) => sch.type === "transition-before") !== undefined}
@@ -195,7 +195,12 @@
 {:else if scheduleView === "card"}
     {#each $schedule[currentDay] as scheduleEntry}
         {@const lecturers = scheduleEntry.lecturer.split("/")}
-        <div class="my-3 p-5 w-[90%] md:w-[90%] bg-alt">
+        <div
+            class="my-3 p-5 w-[90%] md:w-[90%] bg-alt border-right"
+            class:cancelled-border={scheduleEntry.type === "cancellation"}
+            class:transition-before-border={scheduleEntry.type === "transition-before"}
+            class:transition-after-border={scheduleEntry.type === "transition-after"}
+            class:done-border={compareAsc(now, `${scheduleEntry.date} ${scheduleEntry.endTime}`) === 1}>
             <div class="flex gap-3 items-center">
                 <div class="i-lets-icons:date-fill w-1em h-1em"></div>
                 <p>{scheduleEntry.date}</p>
@@ -273,5 +278,21 @@
 
     .done-row {
         --at-apply: bg-green-500/10;
+    }
+
+    .transition-before-border {
+        --at-apply: border-r-12 border-yellow-300/13 !important;
+    }
+
+    .transition-after-border {
+        --at-apply: border-r-12 border-blue-300/10 !important;
+    }
+
+    .cancelled-border {
+        --at-apply: border-r-12 border-red-500/10 !important;
+    }
+
+    .done-border {
+        --at-apply: border-r-12 border-green-500/10;
     }
 </style>
