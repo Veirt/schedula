@@ -3,7 +3,7 @@
     import TextInput from "./input/TextInput.svelte"
     import Modal from "$lib/components/Modal.svelte"
     import axios from "$lib/axios"
-    import { schedule } from "$lib/store/schedule"
+    import { schedule, uniqueSchedule } from "$lib/store/schedule"
     import { nextDay, type Day, formatRelative, isToday, compareAsc } from "date-fns"
     import { format } from "date-fns"
     import { createEventDispatcher } from "svelte"
@@ -13,15 +13,7 @@
     export let currScheduleChange: Partial<CurrScheduleChange>
 
     let scheduledDateOptions: Date[] = []
-    let defaultSchedules: Schedule[] = []
     let isLoading = false
-
-    async function fetchDefaultSchedule() {
-        const res = await axios.get("/api/schedule/default")
-        if (res.status === 200) {
-            defaultSchedules = res.data.data
-        }
-    }
 
     const dispatch = createEventDispatcher()
 
@@ -99,11 +91,6 @@
         if (showScheduleChangeModal.open && showScheduleChangeModal.form === "update") {
             if (scheduledDateOptions.length === 0) handleCourseChange()
         }
-
-        // get course everytime opening the form
-        if (showScheduleChangeModal.open) {
-            fetchDefaultSchedule()
-        }
     }
 
     $: {
@@ -171,7 +158,7 @@
             class="p-2 bg-alt"
             id="course">
             <option value={null} selected hidden>Select a course</option>
-            {#each defaultSchedules as schedule}
+            {#each $uniqueSchedule as schedule}
                 <option value={schedule.id}>{schedule.course}</option>
             {/each}
         </select>

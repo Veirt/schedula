@@ -8,7 +8,6 @@ import {
     createScheduleChange,
     deleteScheduleById,
     deleteScheduleChangeById,
-    getDefaultSchedules,
     getScheduleById,
     getScheduleChangeById,
     getScheduleChanges,
@@ -52,9 +51,6 @@ scheduleRouter.delete(
     deleteScheduleChangeById,
 )
 scheduleRouter.post("/changes", zValidator("json", insertScheduleChangeSchema), createScheduleChange)
-
-// Get default schedule
-scheduleRouter.get("/default", getDefaultSchedules)
 
 // Get schedule this week
 scheduleRouter.get(

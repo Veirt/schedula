@@ -8,12 +8,6 @@ import {
     updateScheduleChangeSchema,
 } from "../db/schema/schedule_changes/handler"
 
-export const getDefaultSchedules = async (c: Context) => {
-    const schedule = await ScheduleHandler.getAll()
-
-    return c.json({ data: schedule })
-}
-
 export const getSchedule = async (c: Context) => {
     const nextNWeeks = c.req.query("nextNWeeks")
     let schedule
