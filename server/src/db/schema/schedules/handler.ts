@@ -5,7 +5,7 @@ import { z } from "zod"
 import db from "../.."
 import { schedules } from "./schema"
 
-type Schedule = typeof schedules.$inferSelect
+export type Schedule = typeof schedules.$inferSelect
 type NewSchedule = typeof schedules.$inferInsert
 
 const timeRegex = new RegExp(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
@@ -138,6 +138,32 @@ export class ScheduleHandler {
 
         const schedule = scheduleRes[0]
         return schedule
+    }
+
+    static async getGrouped(nextNWeeks?: string) {
+        let schedule
+        if (nextNWeeks) {
+            schedule = await this.get(parseInt(nextNWeeks))
+        } else {
+            schedule = await this.get()
+        }
+
+        // @ts-ignore
+        let grouped = Object.groupBy(schedule, ({ day, transitionedDay }: { day: Day; transitionedDay: Day }) =>
+            transitionedDay !== null ? transitionedDay : day,
+        )
+        grouped = {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            ...grouped,
+        }
+
+        return grouped
     }
 
     static async insert(sch: NewSchedule) {

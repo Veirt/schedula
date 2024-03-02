@@ -3,6 +3,7 @@ import { checkRequiredVariables } from "./config/env"
 import authRouter from "./routes/auth.route"
 import oauthRouter from "./routes/oauth.route"
 import scheduleRouter from "./routes/schedule.route"
+import "./notifier/index"
 
 checkRequiredVariables()
 

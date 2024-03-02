@@ -10,27 +10,7 @@ import {
 
 export const getSchedule = async (c: Context) => {
     const nextNWeeks = c.req.query("nextNWeeks")
-    let schedule
-    if (nextNWeeks) {
-        schedule = await ScheduleHandler.get(parseInt(nextNWeeks))
-    } else {
-        schedule = await ScheduleHandler.get()
-    }
-
-    // @ts-ignore
-    let grouped = Object.groupBy(schedule, ({ day, transitionedDay }: { day: Day; transitionedDay: Day }) =>
-        transitionedDay !== null ? transitionedDay : day,
-    )
-    grouped = {
-        0: [],
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        ...grouped,
-    }
+    const grouped = await ScheduleHandler.getGrouped(nextNWeeks)
 
     return c.json({ data: grouped })
 }

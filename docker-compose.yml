@@ -4,10 +4,12 @@ services:
   server:
     container_name: schedula_server
     environment:
+      - TZ=Asia/Makassar
       - DISCORD_OAUTH_CLIENT_ID=
       - DISCORD_OAUTH_CLIENT_SECRET=
       - DISCORD_SERVER_ID=
       - DISCORD_OAUTH_REDIRECT_URI=
+      - DISCORD_WEBHOOK_URL=
       - JWT_SECRET=
     volumes:
       - ./server/db:/app/db # db directory
@@ -19,16 +21,5 @@ services:
       - 8490:80
     build:
       context: client
-    depends_on:
-      - server
-  notifier:
-    container_name: schedula_notifier
-    environment:
-      - TZ=Etc/UTC
-      - SCHEDULE_API_URL=http://server:3000/api
-      - DISCORD_WEBHOOK_URL=
-    build:
-      context: notifier
-      dockerfile: Dockerfile
     depends_on:
       - server
