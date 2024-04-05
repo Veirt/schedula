@@ -32,21 +32,28 @@
 
 <nav class="flex flex-row justify-between items-center p-3 border-b border-alt min-h-20">
     <h1 class="font-bold">Schedula</h1>
-    <div class="flex flex-row items-center">
+    <div class="flex flex-row items-center text-sm md:text-md">
         {#if $isLoggedIn === true}
-            <button class="py-2 px-5 rounded bg-alt" on:click={() => (showCreateModal = true)}>Create</button>
+            <button class="flex gap-2 items-center py-2 px-5 rounded bg-alt" on:click={() => (showCreateModal = true)}>
+                <div class="i-ic:baseline-create w-1em h-1em"></div>
+                Create
+            </button>
             <button
-                class="py-2 px-5 mx-3 rounded bg-alt"
-                on:click={() => (showScheduleChangeModal = { open: true, form: "create" })}
-                >Create Schedule Change</button>
+                class="flex gap-2 items-center py-2 px-5 mx-3 rounded bg-alt"
+                on:click={() => (showScheduleChangeModal = { open: true, form: "create" })}>
+                <div class="i-material-symbols:change-circle w-1em h-1em"></div>
+                Change
+            </button>
 
-            <div class="ml-3" on:focusout={handleDropdownFocusLoss}>
+            <div class="ml-1 md:ml-3" on:focusout={handleDropdownFocusLoss}>
                 <!-- svelte-ignore a11y-missing-attribute -->
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <button on:click={() => (showDropdownMenu = !showDropdownMenu)}>
                     <!-- Avatar -->
-                    <img class="w-12 rounded-full cursor-pointer" src={getAvatar($account.id, $account.avatar)} />
+                    <img
+                        class="w-10 rounded-full cursor-pointer md:w-12"
+                        src={getAvatar($account.id, $account.avatar)} />
                 </button>
 
                 <ul
