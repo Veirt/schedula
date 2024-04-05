@@ -185,7 +185,12 @@
                                         class:cursor-not-allowed={isChangeDeletable(scheduleEntry)}
                                         class="py-2 px-3 rounded bg-alt">Delete</button>
 
-                                    <button class="py-2 px-3 bg-red-600 rounded">Cancel</button>
+                                    <button
+                                        on:click={() => {
+                                            showScheduleChangeModal = { open: true, form: "create" }
+                                            currScheduleChange.scheduleId = scheduleEntry.id
+                                        }}
+                                        class="py-2 px-3 bg-yellow-700 rounded">Change</button>
                                 </div>
                             </td>
                         {/if}

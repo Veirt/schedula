@@ -152,7 +152,6 @@
         <select
             required
             bind:value={currScheduleChange.scheduleId}
-            on:change={handleCourseChange}
             disabled={showScheduleChangeModal.form === "update"}
             class:cursor-not-allowed={showScheduleChangeModal.form === "update"}
             class="p-2 bg-alt"
@@ -163,12 +162,19 @@
             {/each}
         </select>
 
-        <label class="my-3" for="type">Type</label>
-        <select required bind:value={currScheduleChange.type} class="p-2 bg-alt" id="type">
-            <option value={null} selected hidden>Select the type of schedule change </option>
-            <option value="transition">Transition / Pemindahan</option>
-            <option value="cancellation">Cancellation / Jam Kosong</option>
-        </select>
+        {#if currScheduleChange.scheduleId}
+            <label class="my-3" for="type">Type</label>
+            <select
+                required
+                bind:value={currScheduleChange.type}
+                on:change={handleCourseChange}
+                class="p-2 bg-alt"
+                id="type">
+                <option value={null} selected hidden>Select the type of schedule change </option>
+                <option value="transition">Transition / Pemindahan</option>
+                <option value="cancellation">Cancellation / Jam Kosong</option>
+            </select>
+        {/if}
 
         {#if currScheduleChange.type}
             <label class="my-3" for="date">Scheduled Date</label>
