@@ -9,4 +9,5 @@ COPY package.json bun.lockb  ./
 RUN bun install --production --frozen-lockfile --no-cache
 COPY . .
 
-CMD ["/bin/sh", "-c", "bun run migrate && bun run start"]
+RUN bun run migrate; exit 0
+CMD ["/bin/sh", "-c", "bun run start"]
