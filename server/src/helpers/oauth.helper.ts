@@ -1,4 +1,4 @@
-import { DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_CLIENT_SECRET, DISCORD_OAUTH_REDIRECT_URI } from "../config/env"
+import { DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_CLIENT_SECRET } from "../config/env"
 
 export const getDiscordUserData = async (accessToken: string) => {
     const userRes = await fetch("https://discord.com/api/users/@me", {

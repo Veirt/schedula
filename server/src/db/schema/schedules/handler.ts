@@ -1,4 +1,4 @@
-import { Day, add, eachDayOfInterval, format, nextMonday, startOfISOWeek } from "date-fns"
+import { Day, add, eachDayOfInterval, format, startOfISOWeek } from "date-fns"
 import { eq, sql } from "drizzle-orm"
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"

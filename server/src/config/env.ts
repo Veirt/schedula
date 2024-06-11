@@ -22,4 +22,5 @@ export const DISCORD_OAUTH_CLIENT_SECRET = process.env.DISCORD_OAUTH_CLIENT_SECR
 export const DISCORD_OAUTH_REDIRECT_URI = process.env.DISCORD_OAUTH_REDIRECT_URI!
 export const DISCORD_SERVER_ID = process.env.DISCORD_SERVER_ID!
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL!
+export const WHATSAPP_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL!
 export const JWT_SECRET = process.env.JWT_SECRET!

@@ -1,9 +1,7 @@
 import { subMinutes } from "date-fns"
 import nodeSchedule from "node-schedule"
 import { Schedule, ScheduleHandler } from "../db/schema/schedules/handler"
-import { DISCORD_WEBHOOK_URL } from "../config/env"
-
-let cache: ScheduleThisWeek | undefined
+import { DISCORD_WEBHOOK_URL, WHATSAPP_WEBHOOK_URL } from "../config/env"
 
 type ScheduleThisWeek = Schedule & {
     transitionedDay: number | null
@@ -18,8 +16,10 @@ type ScheduleGrouped = {
     [key: string]: ScheduleThisWeek[]
 }
 
+let cache: ScheduleGrouped | undefined
+
 async function getSchedule() {
-    return await ScheduleHandler.getGrouped()
+    return (await ScheduleHandler.getGrouped()) as ScheduleGrouped
 }
 
 async function setupSchedule(data: ScheduleGrouped) {
@@ -39,13 +39,24 @@ async function setupSchedule(data: ScheduleGrouped) {
                 const payload = {
                     content: `Reminder: ${message}`,
                 }
-                await fetch(DISCORD_WEBHOOK_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                })
+
+                if (DISCORD_WEBHOOK_URL)
+                    await fetch(DISCORD_WEBHOOK_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(payload),
+                    })
+
+                if (WHATSAPP_WEBHOOK_URL)
+                    await fetch(WHATSAPP_WEBHOOK_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({ message: payload.content }),
+                    })
             })
         }
     }
