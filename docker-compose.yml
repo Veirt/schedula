@@ -1,8 +1,7 @@
-version: "3.0"
-
 services:
-  server:
-    container_name: schedula_server
+  schedula:
+    container_name: schedula
+    image: ghcr.io/veirt/schedula:latest
     environment:
       - TZ=Asia/Makassar
       - DISCORD_OAUTH_CLIENT_ID=
@@ -13,13 +12,4 @@ services:
       - JWT_SECRET=
     volumes:
       - ./server/db:/app/db # db directory
-    build:
-      context: server
-  client:
-    container_name: schedula_client
-    ports:
-      - 8490:80
-    build:
-      context: client
-    depends_on:
-      - server
+    build: .
